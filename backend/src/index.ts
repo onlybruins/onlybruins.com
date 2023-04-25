@@ -1,11 +1,14 @@
-import express from 'express'
+import express from 'express';
 import apiRouter from './api';
+import path from 'path';
 
 const app = express()
 const port = 3070
 
+app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
+
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
 });
 
 app.use('/api', apiRouter);
