@@ -1,8 +1,11 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
+import cors from 'cors';
 
 const app = express()
 const port = 3070
+
+app.use(cors());
 
 class FakePost {
   username: string;
