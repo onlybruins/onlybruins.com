@@ -1,11 +1,10 @@
 {
-  "name": "onlybruins-backend",
+  "name": "onlybruins.com",
   "version": "1.0.0",
-  "description": "",
   "main": "dist",
   "scripts": {
-    "build": "tsc",
-    "start": "node .",
+    "build": "npm run --prefix frontend build; npm run --prefix backend build",
+    "start": "npm run build && npm run --prefix backend start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
