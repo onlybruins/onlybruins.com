@@ -16,13 +16,16 @@ import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
 import { Logo } from "./Logo"
 import { Coins } from "phosphor-react";
+import { useState } from "react"
+import InfiniteScroll from 'react-infinite-scroller';
 
 interface PostProps {
   username: string,
-  postDate: Date,
+  postDate: string,
   imageUrl: string,
-  tippedAmount?: string,
+  tippedAmount?: number,
 }
+
 const Post = ({
   username, postDate, imageUrl, tippedAmount
 }: PostProps) => {
@@ -32,7 +35,7 @@ const Post = ({
         <Flex>
           <Heading textAlign='left' size='sm'>{username}</Heading>
           <Spacer />
-          <Heading textAlign='left' size='sm' fontWeight='normal' color="grey">{postDate.toDateString()}</Heading>
+          <Heading textAlign='left' size='sm' fontWeight='normal' color="grey">{postDate}</Heading>
         </Flex>
       </CardHeader>
       <CardBody>
@@ -54,14 +57,49 @@ const Post = ({
   )
 }
 
+const Feed = () => {
+  const [posts, setPosts] = useState([]);
+
+  const fetchData = () => {
+    console.log('fetching...')
+    const endpoint = 'http://onlybruins.com:3070/api/fakePosts';
+    // const endpoint = 'localhost:3070/api/fakePosts';
+    const newPostsP = fetch(endpoint).then(res => res.json());
+    newPostsP.then(newPosts => {
+      console.log('done')
+      setPosts(posts.concat(newPosts))
+    });
+  }
+
+  return (
+    <div>
+      <InfiniteScroll
+        loadMore={fetchData}
+        hasMore={true}
+      >
+        {
+          posts.map(({ username, postDate, imageUrl, tippedAmount }: PostProps) => (
+            <Post username={username}
+              postDate={postDate}
+              imageUrl={imageUrl}
+              tippedAmount={tippedAmount} />
+          ))
+        }
+      </InfiniteScroll>
+    </div>
+  )
+}
+
+
 export const App = () => (
   <ChakraProvider theme={theme}>
     <Box textAlign="center" fontSize="xl">
       <Grid minH="100vh" p={3}>
         <ColorModeSwitcher justifySelf="flex-end" />
         <VStack spacing={8}>
-          <Post username="@mzzzchael" postDate={new Date('December 17, 1995 03:24:00')} imageUrl="https://www.tasteofhome.com/wp-content/uploads/2018/04/grilledcheesesocial-copy.jpg" tippedAmount="3" />
-          <Post username="@tb" postDate={new Date('December 17, 2021 03:24:00')} imageUrl="https://spoonuniversity.com/wp-content/uploads/sites/55/2016/01/FullSizeRender-4.jpg" />
+          <Post username="@mzzzchael" postDate={'December 17, 1995 03:24:00'} imageUrl="https://www.tasteofhome.com/wp-content/uploads/2018/04/grilledcheesesocial-copy.jpg" tippedAmount={3} />
+          <Post username="@tb" postDate={'December 17, 2021 03:24:00'} imageUrl="https://spoonuniversity.com/wp-content/uploads/sites/55/2016/01/FullSizeRender-4.jpg" />
+          <Feed />
         </VStack>
       </Grid>
     </Box>
