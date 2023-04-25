@@ -62,7 +62,7 @@ const Feed = () => {
 
   const fetchData = () => {
     console.log('fetching...')
-    const endpoint = 'http://onlybruins.com:3070/api/fakePosts';
+    const endpoint = 'http://onlybruins.com/api/fakePosts';
     // const endpoint = 'localhost:3070/api/fakePosts';
     const newPostsP = fetch(endpoint).then(res => res.json());
     newPostsP.then(newPosts => {
