@@ -1,5 +1,6 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
+import { getAssociatedName } from './db';
 
 const api = express.Router();
 
@@ -27,6 +28,17 @@ function createRandomFakePost(): FakePost {
 api.get('/fakePosts', (_req, res) => {
   const data = Array.apply(null, Array(20)).map(() => createRandomFakePost());
   res.json(data);
+});
+
+api.get('/goofyDB/:email', async (req, res) => {
+
+  // get the :email field in the URL
+  const email = req.params.email;
+  const dbres = await getAssociatedName(email)
+  if (dbres === undefined)
+    res.json("No associated user found")
+  else
+    res.json(dbres)
 });
 
 export default api;
