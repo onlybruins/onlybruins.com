@@ -33,4 +33,4 @@ psql --username=dev onlybruinsdb -f setup.sql
 # add initial data
 if [ "$GOOFY" -eq 1 ]; then
   psql --username=dev onlybruinsdb -f initdata.sql
-end
+fi
