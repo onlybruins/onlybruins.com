@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool, PoolClient } from 'pg';
 
 /* we have a pool of connections to our database, which is
  * abstracted away as a Pool object. when we want to make a query,
@@ -15,7 +15,7 @@ const pool = new Pool({
 
 /* we add onlybruins to the search path so we don't need to fully qualify
  * our table names, for instance */
-pool.on('connect', (client) => {
+pool.on('connect', (client: PoolClient) => {
   client.query('SET search_path TO onlybruins,public');
 });
 
