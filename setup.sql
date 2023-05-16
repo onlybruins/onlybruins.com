@@ -12,6 +12,10 @@ CREATE SCHEMA onlybruins;
  * like 'users' will be searched through and found under the
  * 'onlybruins' schema. search_path is sorta like $PATH in the shell,
  * and 'public' is the default schema.
+
+ * From PostgreSQL docs:
+ *   The first schema in the search path that exists is
+ *   the default location for creating new objects.
  */
 SET search_path TO onlybruins,public;
 
