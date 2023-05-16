@@ -10,7 +10,7 @@ import { Pool } from 'pg';
  * are finished, client.release()
  */
 const pool = new Pool({
-  database: 'onlybruins-local'
+  database: 'onlybruinsdb'
 })
 
 /* we add onlybruins to the search path so we don't need to fully qualify
