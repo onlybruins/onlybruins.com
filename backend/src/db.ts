@@ -26,3 +26,15 @@ export const getAssociatedName = async (username: string) => {
   if (res.rows.length === 0) return undefined;
   return res.rows[0].name
 };
+
+export const getFollowers = async (username: string) => {
+  const client = await pool.connect()
+  let res = await client.query('SELECT id FROM users WHERE username = $1', [username])
+  if (res.rows.length === 0) return undefined;
+  const uid = res.rows[0].id
+  res = await client.query('SELECT follower_id FROM subscriptions WHERE creator_id = $1', [uid])
+  let res2 = await Promise.all(res.rows.map(({ follower_id }) => client.query('SELECT username FROM users WHERE id = $1', [follower_id])));
+  let usernames = res2.map(res => res.rows[0].username);
+  client.release()
+  return usernames
+};

@@ -1,6 +1,6 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName } from './db';
+import { getAssociatedName, getFollowers } from './db';
 
 const api = express.Router();
 
@@ -35,6 +35,15 @@ api.get('/goofyDB/:username', async (req, res) => {
   // get the :email field in the URL
   const username = req.params.username;
   const dbres = await getAssociatedName(username)
+  if (dbres === undefined)
+    res.json("No associated user found")
+  else
+    res.json(dbres)
+});
+
+api.get('/users/:username/followers', async (req, res) => {
+  const username = req.params.username;
+  const dbres = await getFollowers(username)
   if (dbres === undefined)
     res.json("No associated user found")
   else
