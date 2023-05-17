@@ -13,8 +13,10 @@
   "dependencies": {
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/pg": "^8.6.6",
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "pg": "^8.11.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
