@@ -36,8 +36,11 @@ try {
   httpsServer.listen(httpsPort, () => {
     console.log(`OnlyBruins API listening on port ${httpsPort}`)
   });
-} catch (e) {
-  console.log("Error encountered while trying to start HTTPS server:")
-  console.log("If developing locally, don't worry about this")
-  console.log(e)
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    console.log("certificate not found, this is fine if you're on localhost");
+    console.log("but note that you must use the HTTP server");
+  } else {
+    throw err;
+  }
 }
