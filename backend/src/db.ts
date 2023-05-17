@@ -19,9 +19,9 @@ pool.on('connect', (client: PoolClient) => {
   client.query('SET search_path TO onlybruins,public');
 });
 
-export const getAssociatedName = async (email: string) => {
+export const getAssociatedName = async (username: string) => {
   const client = await pool.connect()
-  const res = await client.query('SELECT name from users where email = $1', [email])
+  const res = await client.query('SELECT name from users where username = $1', [username])
   client.release()
   if (res.rows.length === 0) return undefined;
   return res.rows[0].name
