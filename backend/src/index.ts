@@ -20,13 +20,16 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiRouter);
 
+const httpPort = 80
+const httpsPort = 443
 
-httpServer.listen(8080, () => {
-  console.log(`OnlyBruins API listening on port ${8080}`)
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(httpPort, () => {
+  console.log(`OnlyBruins API listening on port ${httpPort}`)
 });
 
-httpsServer.listen(8443, () => {
-  console.log(`OnlyBruins API listening on port ${8443}`)
+httpsServer.listen(httpsPort, () => {
+  console.log(`OnlyBruins API listening on port ${httpsPort}`)
 });
