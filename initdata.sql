@@ -27,4 +27,11 @@ INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VAL
   400
 );
 
+INSERT INTO subscriptions (creator_id, follower_id)
+SELECT u1.id, u2.id
+FROM users u1
+CROSS JOIN users u2
+WHERE u1.username = 'T Omegalul M' AND u2.username != 'T Omegalul M';
+
 SELECT * FROM users;
+SELECT * FROM subscriptions;
