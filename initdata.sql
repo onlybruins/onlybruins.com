@@ -1,6 +1,7 @@
 SET search_path TO onlybruins,public;
 
-INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
+INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VALUES (
+  'micah',
   'michaellan202@gmail.com',
   'Michael Lan',
   'mo jamba',
@@ -8,7 +9,8 @@ INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
   4
 );
 
-INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
+INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VALUES (
+  'T Omegalul M',
   'tombinford@ucla.edu',
   'Tom Binford',
   'bruin bonanza',
@@ -16,7 +18,8 @@ INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
   28
 );
 
-INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
+INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VALUES (
+  'naketris',
   'naketriskirk03@ucla.edu',
   'Naketris Kirk',
   'bruin baptism',
@@ -24,4 +27,4 @@ INSERT INTO users(email, name, password_hash, balance, streak_cnt) VALUES (
   400
 );
 
-SELECT email FROM users;
+SELECT * FROM users;

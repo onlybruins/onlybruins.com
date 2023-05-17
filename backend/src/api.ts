@@ -30,11 +30,11 @@ api.get('/fakePosts', (_req, res) => {
   res.json(data);
 });
 
-api.get('/goofyDB/:email', async (req, res) => {
+api.get('/goofyDB/:username', async (req, res) => {
 
   // get the :email field in the URL
-  const email = req.params.email;
-  const dbres = await getAssociatedName(email)
+  const username = req.params.username;
+  const dbres = await getAssociatedName(username)
   if (dbres === undefined)
     res.json("No associated user found")
   else
