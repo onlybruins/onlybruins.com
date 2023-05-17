@@ -20,8 +20,13 @@ app.get('/', (req, res) => {
 
 app.use('/api', apiRouter);
 
-const httpPort = 80
-const httpsPort = 443
+let httpPort = 80;
+let httpsPort = 443;
+
+if (process.env.NODE_ENV !== 'production') {
+  httpPort += 8000;
+  httpsPort += 8000;
+}
 
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(credentials, app);
