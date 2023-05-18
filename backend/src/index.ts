@@ -29,8 +29,8 @@ httpServer.listen(httpPort, () => {
 });
 
 try {
-  const privateKey = fs.readFileSync('../../privatekey.key', 'utf8');
-  const certificate = fs.readFileSync('../../certificate.pem', 'utf8');
+  const privateKey = fs.readFileSync(process.env['HOME'] + '/privatekey.key', 'utf8');
+  const certificate = fs.readFileSync(process.env['HOME'] + '/certificate.pem', 'utf8');
   const credentials = { key: privateKey, cert: certificate };
   const httpsServer = https.createServer(credentials, app);
   httpsServer.listen(httpsPort, () => {
