@@ -13,10 +13,10 @@ fi
 
 # install postgres if not installed
 if command -v psql; then
-  echo 'postgres installed'
+  echo 'postgresql installed'
 else
-  echo 'installing postgres'
-  sudo apt install postgres postgres-contrib
+  echo 'installing postgresql'
+  sudo apt install postgresql postgresql-contrib
   sudo systemctl start postgresql.service
 fi
 
