@@ -3,7 +3,7 @@ import apiRouter from './api';
 import path from 'path';
 
 const app = express();
-const port = 80;
+const port = 8080;
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
 

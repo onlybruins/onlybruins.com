@@ -11,6 +11,11 @@ import {
   Tooltip,
   Flex,
   Spacer,
+  Input,
+  InputLeftElement,
+  InputRightElement,
+  InputGroup,
+  CheckboxIcon,
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
@@ -40,6 +45,18 @@ const Post = ({
       </CardHeader>
       <CardBody>
         <Image borderRadius="8px" boxSize="500px" src={imageUrl} />
+        <InputGroup>
+          <InputLeftElement 
+            pointerEvents='none'
+            color='gray.300'
+            fontSize='1.2em'
+            children='$' 
+          />
+          <Input placeholder='How much would you like to tip?' />
+          <InputRightElement>
+            <CheckboxIcon color='green.500' />
+          </InputRightElement>        
+        </InputGroup>
         <HStack paddingTop="1rem">
           {
             tippedAmount ?
