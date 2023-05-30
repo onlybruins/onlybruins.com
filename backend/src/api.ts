@@ -1,6 +1,6 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing } from './db';
+import { getAssociatedName, getFollowers, getFollowing, getPosts } from './db';
 
 const api = express.Router();
 
@@ -52,6 +52,14 @@ api.get('/users/:username/following', async (req, res) => {
   const dbres = await getFollowing(req.params.username);
   if (dbres === undefined)
     res.json("No associated user found");
+  else
+    res.json(dbres);
+});
+
+api.get('/users/:username/posts', async (req, res) => {
+  const dbres = await getPosts(req.params.username);
+  if (dbres === undefined)
+    res.status(404).send();
   else
     res.json(dbres);
 });
