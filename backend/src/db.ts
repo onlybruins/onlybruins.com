@@ -1,3 +1,4 @@
+import { NameModule } from '@faker-js/faker';
 import { Pool, PoolClient } from 'pg';
 
 /* we have a pool of connections to our database, which is
@@ -62,13 +63,46 @@ export const getPosts = async (username: string) => {
     return undefined;
   const [uid, name] = [res.rows[0].id, res.rows[0].name];
   return await pool.query(
-    `SELECT image_id, image_extension, timestamp
+    `SELECT post_id, image_id, image_extension, timestamp
     FROM posts
     WHERE poster_id = $1`, [uid])
-    .then(res => res.rows.map(({image_id, image_extension, timestamp}) => ({
-      poster_name: name,
-      poster_username: username,
-      image_endpoint: `/images/${image_id}.${image_extension}`,
+    .then(res => res.rows.map(({ post_id, image_id, image_extension, timestamp }) => ({
+      post_id,
+      username,
+      name,
+      image_id,
+      image_extension,
       timestamp
     })));
+}
+
+export const getPost = async (username: string, post_id: number) => {
+  const res = await pool.query(
+    `SELECT users.name, posts.image_id, posts.image_extension, posts.timestamp
+    FROM posts
+    JOIN users
+    ON users.id = posts.poster_id
+    WHERE users.username = $1 AND posts.post_id = $2`, [username, post_id]);
+  console.log('getPost:', res);
+  if (res.rows.length === 0)
+    return undefined;
+  const { name, image_id, image_extension, timestamp } = res.rows[0];
+  return {
+    post_id,
+    username,
+    name,
+    image_id,
+    image_extension,
+    timestamp
+  }
+}
+
+export const makePost = async (username: string, image_id: string, image_extension: string) => {
+  const res = await pool.query(
+    `INSERT INTO posts(poster_id, image_id, image_extension)
+    VALUES((SELECT id FROM users WHERE username = $1), $2, $3)
+    RETURNING post_id`, [username, image_id, image_extension]);
+  if (res.rows.length === 0)
+    return undefined;
+  return res.rows[0].post_id;
 }
