@@ -55,3 +55,20 @@ export const getFollowing = async (username: string) => {
     WHERE subscriptions.follower_id = $1`, [uid])
     .then(res => res.rows.map(r => r.username));
 }
+
+export const getPosts = async (username: string) => {
+  const res = await pool.query('SELECT id, name FROM users WHERE username = $1', [username]);
+  if (res.rows.length === 0)
+    return undefined;
+  const [uid, name] = [res.rows[0].id, res.rows[0].name];
+  return await pool.query(
+    `SELECT image_id, image_extension, timestamp
+    FROM posts
+    WHERE poster_id = $1`, [uid])
+    .then(res => res.rows.map(({image_id, image_extension, timestamp}) => ({
+      poster_name: name,
+      poster_username: username,
+      image_endpoint: `/images/${image_id}.${image_extension}`,
+      timestamp
+    })));
+}

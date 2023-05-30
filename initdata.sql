@@ -33,5 +33,9 @@ FROM users u1
 CROSS JOIN users u2
 WHERE u1.username = 'T Omegalul M' AND u2.username != 'T Omegalul M';
 
+INSERT INTO posts(poster_id, image_id, image_extension) VALUES (
+  (SELECT id FROM users WHERE username = 'T Omegalul M'), '904c54e5-d2ae-4766-b0bf-c8a77b29b5c5', 'png'
+);
+
 SELECT * FROM users;
 SELECT * FROM subscriptions;

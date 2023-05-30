@@ -35,10 +35,11 @@ CREATE TABLE subscriptions (
 );
 
 CREATE TABLE posts (
-  post_id   serial primary key UNIQUE,
-  poster_id int references users(id),
-  image_id  uuid,
-  timestamp timestamp
+  post_id         serial primary key UNIQUE,
+  poster_id       int references users(id),
+  image_id        uuid,
+  image_extension varchar(5),
+  timestamp       timestamptz default (now() at time zone 'utc')
 );
 
 CREATE TABLE logins (
