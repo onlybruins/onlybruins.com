@@ -9,6 +9,13 @@ const app = express();
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
 
+app.get('/images/:image_id_dot_extension', (req, res) => {
+  const a = req.params.image_id_dot_extension;
+  const [first_two, rest] = [a.substring(0, 2), a.substring(2)];
+  const p = path.resolve(__dirname, '../../ugc-images', `${first_two}/${rest}`);
+  res.sendFile(p);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../../frontend/build', 'index.html'));
 });
