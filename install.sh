@@ -22,15 +22,15 @@ fi
 
 # create a postgres superuser
 # TODO: this might not be a superuser
-sudo -u postgres createuser --superuser dev
+sudo -u postgres createuser --superuser $USER
 
 # create database
-createdb --username=dev onlybruinsdb
+createdb onlybruinsdb
 
 # create all tables
-psql --username=dev onlybruinsdb -f setup.sql
+psql onlybruinsdb -f setup.sql
 
 # add initial data
 if [ "$GOOFY" -eq 1 ]; then
-  psql --username=dev onlybruinsdb -f initdata.sql
+  psql onlybruinsdb -f initdata.sql
 fi
