@@ -1,80 +1,18 @@
-import * as React from "react"
 import {
   ChakraProvider,
   Box,
-  Button,
   VStack,
-  Grid,
   theme,
-  Heading,
-  HStack,
-  Image,
-  Tooltip,
-  Flex,
-  Spacer,
-  Input,
-  InputLeftElement,
-  InputRightElement,
-  InputGroup,
-  CheckboxIcon,
+  Center,
+  Button,
 } from "@chakra-ui/react"
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { Coins } from "phosphor-react";
+import { Card } from '@chakra-ui/react'
 import { useState } from "react"
 import InfiniteScroll from 'react-infinite-scroller';
 import FileUpload from './FileUpload';
 import { useForm } from "react-hook-form";
-
-interface PostProps {
-  username: string,
-  postDate: string,
-  imageUrl: string,
-  tippedAmount?: number,
-}
-
-const Post = ({
-  username, postDate, imageUrl, tippedAmount
-}: PostProps) => {
-  return (
-    <Card>
-      <CardHeader paddingBottom="0px">
-        <Flex>
-          <Heading textAlign='left' size='sm'>{username}</Heading>
-          <Spacer />
-          <Heading textAlign='left' size='sm' fontWeight='normal' color="grey">{postDate}</Heading>
-        </Flex>
-      </CardHeader>
-      <CardBody>
-        <Image borderRadius="8px" boxSize="500px" src={imageUrl} />
-        <InputGroup>
-          <InputLeftElement 
-            pointerEvents='none'
-            color='gray.300'
-            fontSize='1.2em'
-            children='$' 
-          />
-          <Input placeholder='How much would you like to tip?' />
-          <InputRightElement>
-            <CheckboxIcon color='green.500' />
-          </InputRightElement>        
-        </InputGroup>
-        <HStack paddingTop="1rem">
-          {
-            tippedAmount ?
-              <Tooltip label={`You've tipped ${tippedAmount} bruinbux`} fontSize='md'>
-                <Coins color="#c4aa7e" weight="fill" size={24} />
-              </Tooltip>
-              :
-              <Tooltip label={`Tip bruinbux to ${username}!`} fontSize='md'>
-                <Coins color="#c4aa7e" weight="regular" size={24} />
-              </Tooltip>
-          }
-        </HStack>
-      </CardBody>
-    </Card>
-  )
-}
+import Nav from "./Nav";
+import { Post } from "./Post";
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -88,21 +26,21 @@ const Feed = () => {
   }
 
   return (
-    <div>
-      <InfiniteScroll
-        loadMore={fetchData}
-        hasMore={true}
-      >
+    <InfiniteScroll
+      loadMore={fetchData}
+      hasMore={true}
+    >
+      <VStack spacing={8}>
         {
-          posts.map(({ username, postDate, imageUrl, tippedAmount }: PostProps) => (
+          posts.map(({ username, postDate, imageUrl, tippedAmount }) => (
             <Post username={username}
               postDate={postDate}
               imageUrl={imageUrl}
               tippedAmount={tippedAmount} />
           ))
         }
-      </InfiniteScroll>
-    </div>
+      </VStack>
+    </InfiniteScroll>
   )
 }
 
@@ -115,26 +53,32 @@ const NewPost = () => {
     formState: { errors, isSubmitting },
   } = useForm()
   return (
-    <FileUpload name="avatar"
-      acceptedFileTypes="image/*"
-      isRequired={true}
-      placeholder="Upload an image..."
-      control={control}>
-      Make a new post!
-    </FileUpload >
+    <Card>
+      <FileUpload name="avatar"
+        acceptedFileTypes="image/*"
+        isRequired={true}
+        placeholder="Upload an image..."
+        control={control}>
+        Make a new post!
+      </FileUpload >
+      <Button type="submit">
+        Post
+      </Button>
+    </Card>
   )
 }
 
 export const App = () => (
   <ChakraProvider theme={theme}>
-    <Box textAlign="center" fontSize="xl">
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack align="center" spacing={8} width='100%' px="24vw">
+    <Nav />
+    <br />
+    <Box fontSize="xl">
+      <Center>
+        <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
           <NewPost />
           <Feed />
         </VStack>
-      </Grid>
+      </Center>
     </Box>
   </ChakraProvider>
 )
