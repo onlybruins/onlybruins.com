@@ -1,3 +1,5 @@
+/* Adapted from https://github.com/chakra-ui/chakra-ui/issues/457 */
+
 import { Input, Image, FormControl, FormLabel, InputGroup, InputLeftElement, FormErrorMessage, Icon } from "@chakra-ui/react";
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { Image as ImageIcon } from "phosphor-react";

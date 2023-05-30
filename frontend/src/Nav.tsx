@@ -1,3 +1,5 @@
+/* Adapted from https://chakra-templates.dev/navigation/navbar */
+
 import {
   Avatar,
   Box,
