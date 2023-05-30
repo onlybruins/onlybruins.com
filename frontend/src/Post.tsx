@@ -14,7 +14,7 @@ import {
   Button,
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-import { Coins } from "phosphor-react"
+import { Coins, CurrencyCircleDollar } from "phosphor-react"
 
 interface PostProps {
   username: string,
@@ -36,20 +36,12 @@ export const Post = ({
         </Flex>
       </CardHeader>
       <CardBody>
-        <Image borderRadius="8px" boxSize="500px" src={imageUrl} />
+        <Image borderRadius="8px" boxSize="100%" src={imageUrl} mb="10px" />
         <InputGroup>
           <InputLeftElement
-            pointerEvents='none'
             color='gray.300'
             fontSize='1.2em'
-            children='$'
-          />
-          <Input placeholder='How much would you like to tip?' />
-          <InputRightElement>
-            <CheckboxIcon color='green.500' />
-          </InputRightElement>
-        </InputGroup>
-        <HStack paddingTop="1rem">
+          >
           {
             tippedAmount ?
               <Tooltip label={`You've tipped ${tippedAmount} bruinbux`} fontSize='md'>
@@ -60,8 +52,15 @@ export const Post = ({
                 <Coins color="#c4aa7e" weight="regular" size={24} />
               </Tooltip>
           }
+          </InputLeftElement>
+          <Input placeholder='How much would you like to tip?' />
+          <InputRightElement>
+            <CheckboxIcon color='green.500' />
+          </InputRightElement>
+        </InputGroup>
+        <HStack paddingTop="1rem">
         </HStack>
       </CardBody>
-    </Card>
+    </Card >
   )
 }
