@@ -53,7 +53,7 @@ const NewPost = () => {
     formState: { errors, isSubmitting },
   } = useForm()
   return (
-    <Card>
+    <Card width='100%'>
       <FileUpload name="avatar"
         acceptedFileTypes="image/*"
         isRequired={true}
