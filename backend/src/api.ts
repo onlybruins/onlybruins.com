@@ -1,6 +1,8 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
 import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
+import multer from 'multer';
+import { UgcStorage, RequestWithUUID } from './diskStorage';
 
 const api = express.Router();
 
@@ -84,19 +86,25 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
     });
 });
 
-api.post('/users/:username/posts', async (req, res) => {
-  //TODO: get an image out of the request body,
-  //  set image_id to a generated GUID,
-  //  store the image to the filesystem,
-  //  call makePost with image_id and the appropriate file extension
-  const image_id = '924954e5-d2ae-4766-b0bf-c8a77b29b5d3';
-  const dbres = await makePost(req.params.username, image_id, 'png');
-  if (dbres === undefined)
-    res.status(404).send();
-  else
-    res.json({
-      post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`)
-    });
+const ugcUpload = multer({ storage: UgcStorage }).single('postImage');
+api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
+  // TODO: use the uuid package to generate uuids
+  req.image_uuid = '924954e5-d2ae-4766-b0bf-c8a77b29b5d3';
+  ugcUpload(req, res, async (err) => {
+    if (err) {
+      res.status(500).send();
+    }
+    else {
+      const dbres = await makePost(req.params.username, req.image_uuid, 'jpg');
+      if (dbres === undefined)
+        res.status(404).send();
+      else {
+        res.json({
+          post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`)
+        });
+      }
+    }
+  });
 });
 
 export default api;

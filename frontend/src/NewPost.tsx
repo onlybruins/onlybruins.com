@@ -1,10 +1,19 @@
 import { Button, Card } from "@chakra-ui/react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import FileUpload from "./FileUpload";
 
-const onSubmit: SubmitHandler<{postImage: File}> = ({postImage}) => {
-    // TODO: POST to /api/users/:username/posts
-    console.log(postImage);
+const username = 'T Omegalul M';
+
+const onSubmit = (data: {postImage: File}) => {
+    const formData = new FormData();
+    formData.append('postImage', data.postImage);
+    fetch(encodeURI(`/api/users/${username}/posts`), {
+      method: "POST",
+      body: formData
+    })
+    .then(res => res.json())
+    .then(json => console.log('response:', json))
+    .catch(console.error);
 }
 
 export const NewPost = () => {
