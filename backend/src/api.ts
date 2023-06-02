@@ -2,7 +2,7 @@ import express from 'express'
 import { faker } from '@faker-js/faker';
 import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
 import multer from 'multer';
-import { UgcStorage, RequestWithUUID } from './diskStorage';
+import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
@@ -87,22 +87,29 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
     });
 });
 
-const ugcUpload = multer({ storage: UgcStorage }).single('postImage');
+const ugcUpload = multer({
+  storage: UgcStorage,
+  fileFilter: (req, file, callback) => callback(null, file.mimetype in supportedMimeTypeToFileExtension)
+}).single('postImage');
 api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
   req.image_uuid = uuidv4();
   ugcUpload(req, res, async (err) => {
     if (err) {
+      console.error(err);
       res.status(500).send();
+      return;
     }
+    if (!req.file) {
+      res.status(400).send();
+      return;
+    }
+    const dbres = await makePost(req.params.username, req.image_uuid, supportedMimeTypeToFileExtension[req.file.mimetype]);
+    if (dbres === undefined)
+      res.status(404).send();
     else {
-      const dbres = await makePost(req.params.username, req.image_uuid, 'jpg');
-      if (dbres === undefined)
-        res.status(404).send();
-      else {
-        const post_endpoint = encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`);
-        console.log(`New post from ${req.params.username}: ${post_endpoint}`);
-        res.json({ post_endpoint });
-      }
+      const post_endpoint = encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`);
+      console.log(`New post from ${req.params.username}: ${post_endpoint}`);
+      res.json({ post_endpoint });
     }
   });
 });
