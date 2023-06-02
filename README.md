@@ -18,10 +18,16 @@ curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 ## Running Locally
-From the `onlybruins.com` directory, run
+During development, for frontend (not backend!) hot-reloading run
+```bash
+npm run --prefix backend build
+npm run dev
+```
+Alternatively, to serve everything from the backend run
 ```bash
 npm start
 ```
+and navigate to http://localhost:8080.
 ## Running in Production
 Ports below 1024 are privileged, but we need port 80 to serve HTTP. You need this one-time setup to let Node use privileged ports:
 ```bash
