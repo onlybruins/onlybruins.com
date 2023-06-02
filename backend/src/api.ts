@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID } from './diskStorage';
+import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
@@ -88,8 +89,7 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
 
 const ugcUpload = multer({ storage: UgcStorage }).single('postImage');
 api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
-  // TODO: use the uuid package to generate uuids
-  req.image_uuid = '924954e5-d2ae-4766-b0bf-c8a77b29b5d3';
+  req.image_uuid = uuidv4();
   ugcUpload(req, res, async (err) => {
     if (err) {
       res.status(500).send();
@@ -99,9 +99,9 @@ api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
       if (dbres === undefined)
         res.status(404).send();
       else {
-        res.json({
-          post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`)
-        });
+        const post_endpoint = encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`);
+        console.log(`New post from ${req.params.username}: ${post_endpoint}`);
+        res.json({ post_endpoint });
       }
     }
   });
