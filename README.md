@@ -17,6 +17,11 @@ On Ubuntu this looks like
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
+#### Install NPM packages
+From the repository root, run
+```bash
+npm install
+```
 ## Running Locally
 During development, for frontend (not backend!) hot-reloading run
 ```bash
