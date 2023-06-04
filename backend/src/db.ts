@@ -1,4 +1,3 @@
-import { NameModule } from '@faker-js/faker';
 import { Pool, PoolClient } from 'pg';
 
 /* we have a pool of connections to our database, which is
@@ -55,6 +54,46 @@ export const getFollowing = async (username: string) => {
     JOIN users ON subscriptions.creator_id = users.id
     WHERE subscriptions.follower_id = $1`, [uid])
     .then(res => res.rows.map(r => r.username));
+}
+
+export const addFollower = async (params: { creator_username: string, follower_username: string }) => {
+  const res = await pool.query(
+    `INSERT INTO subscriptions(follower_id, creator_id)
+    VALUES((SELECT id FROM users WHERE username = $1), (SELECT id FROM users WHERE username = $2))
+    ON CONFLICT DO NOTHING`, [params.follower_username, params.creator_username]);
+  if (res.rows.length > 0) {
+    // successfully followed
+    return true;
+  }
+  else {
+    const res2 = await pool.query(
+      `SELECT 1
+      FROM users
+      WHERE username = $1 OR username = $2`,
+      [params.follower_username, params.creator_username]);
+    // OK if the users exist (attempted to follow again), not OK otherwise
+    return res2.rows.length == 2;
+  }
+}
+
+export const removeFollower = async (params: {creator_username: string, follower_username: string}) => {
+  const res = await pool.query(
+    `DELETE FROM subscriptions
+    WHERE follower_id = (SELECT id FROM users WHERE username = $1)
+          AND creator_id = (SELECT id FROM users WHERE username = $2)
+    `, [params.follower_username, params.creator_username]);
+  if (res.rows.length > 0) {
+    return true;
+  }
+  else {
+    const res2 = await pool.query(
+      `SELECT 1
+      FROM users
+      WHERE username = $1 OR username = $2`,
+      [params.follower_username, params.creator_username]);
+      // OK if the users exist (wasn't following to begin with), not OK otherwise
+      return res2.rows.length == 2;
+  }
 }
 
 export const getPosts = async (username: string) => {
