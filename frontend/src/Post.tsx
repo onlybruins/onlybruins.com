@@ -9,12 +9,10 @@ import {
   InputLeftElement,
   InputRightElement,
   InputGroup,
-  CheckboxIcon,
-  Center,
-  Button,
+  CheckboxIcon
 } from "@chakra-ui/react"
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-import { Coins, CurrencyCircleDollar } from "phosphor-react"
+import { Card, CardHeader, CardBody } from '@chakra-ui/react'
+import { Coins } from "phosphor-react"
 
 interface PostProps {
   username: string,

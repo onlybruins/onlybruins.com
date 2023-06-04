@@ -1,7 +1,7 @@
 /* Adapted from https://github.com/chakra-ui/chakra-ui/issues/457 */
 
-import { Input, Image, FormControl, FormLabel, InputGroup, InputLeftElement, FormErrorMessage, Icon } from "@chakra-ui/react";
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+import { Input, Image, FormControl, FormLabel, InputGroup, InputLeftElement, FormErrorMessage } from "@chakra-ui/react";
+import { CardBody } from '@chakra-ui/react'
 import { Image as ImageIcon } from "phosphor-react";
 import { useController } from "react-hook-form";
 import { useRef } from "react";
@@ -43,7 +43,7 @@ export const FileUpload = ({ name, placeholder, acceptedFileTypes, control, chil
             onClick={() => inputRef.current.click()}
             // onChange={(e) => {}}
             readOnly={true}
-            value={value && value.name || ''}
+            value={(value && value.name) || ''}
           />
         </InputGroup>
         <FormErrorMessage>
