@@ -10,6 +10,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
 import { Post } from "./Post";
+import Reg from "./Login";
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -48,6 +49,7 @@ export const App = () => (
     <Box fontSize="xl">
       <Center>
         <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
+          <Reg />
           <NewPost />
           <Feed />
         </VStack>

@@ -12,6 +12,7 @@ import {
   CheckboxIcon,
   Center,
   Button,
+  useColorModeValue,
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { Coins, CurrencyCircleDollar } from "phosphor-react"
@@ -26,6 +27,7 @@ interface PostProps {
 export const Post = ({
   username, postDate, imageUrl, tippedAmount
 }: PostProps) => {
+  const coinColor = useColorModeValue("#c4aa7e", "green");
   return (
     <Card>
       <CardHeader paddingBottom="0px">
@@ -45,11 +47,11 @@ export const Post = ({
           {
             tippedAmount ?
               <Tooltip label={`You've tipped ${tippedAmount} bruinbux`} fontSize='md'>
-                <Coins color="#c4aa7e" weight="fill" size={24} />
+                <Coins color={coinColor} weight="fill" size={24} />
               </Tooltip>
               :
               <Tooltip label={`Tip bruinbux to ${username}!`} fontSize='md'>
-                <Coins color="#c4aa7e" weight="regular" size={24} />
+                <Coins color={coinColor} weight="regular" size={24} />
               </Tooltip>
           }
           </InputLeftElement>
