@@ -99,7 +99,7 @@ const Feed = () => {
   const [posts, setPosts] = useState([]);
 
   const fetchData = () => {
-    const endpoint = '/api/fakePosts';
+    const endpoint = '/api/users/T%20Omegalul%20M/posts';
     const newPostsP = fetch(endpoint).then(res => res.json());
     newPostsP.then(newPosts => {
       setPosts(posts.concat(newPosts))
@@ -113,10 +113,11 @@ const Feed = () => {
     >
       <VStack spacing={8}>
         {
-          posts.map(({ username, postDate, imageUrl }: PostProps) => (
-            <Post user={username}
-              date={postDate}
-              image={imageUrl} />
+          posts.map(({ poster_username, timestamp, image_endpoint }) => (
+            <Post username={poster_username}
+              postDate={timestamp}
+              imageUrl={image_endpoint}
+              tippedAmount={100} />
           ))
         }
       </VStack>
