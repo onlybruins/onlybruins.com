@@ -85,8 +85,17 @@ const Post = ({ imageUrl, postDate, username }: PostProps) => {
   )
 }
 
+interface BackendPost {
+  post_endpoint: string,
+  poster_name: string,
+  poster_username: string,
+  image_endpoint: string,
+  timestamp: string,
+  tippedAmount?: number,
+}
+
 const Feed = () => {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<BackendPost[]>([]);
 
   const fetchData = () => {
     const endpoint = '/api/fakePosts';
@@ -103,10 +112,10 @@ const Feed = () => {
     >
       <VStack spacing={8}>
         {
-          posts.map(({ username, postDate, imageUrl }) => (
-            <Post username={username}
-              postDate={postDate}
-              imageUrl={imageUrl} />
+          posts.map(({ image_endpoint, poster_username, timestamp }) => (
+            <Post username={poster_username}
+              postDate={timestamp}
+              imageUrl={image_endpoint} />
           ))
         }
       </VStack>
@@ -122,8 +131,6 @@ export const App = () => (
       <Center>
         <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
           <NewPost />
-          <Post username="@mzzzchael" postDate={'December 17, 1995 03:24:00'} imageUrl="https://www.tasteofhome.com/wp-content/uploads/2018/04/grilledcheesesocial-copy.jpg" />
-          <Post username="@tb" postDate={'December 17, 2021 03:24:00'} imageUrl="https://spoonuniversity.com/wp-content/uploads/sites/55/2016/01/FullSizeRender-4.jpg" />
           <Feed />
         </VStack>
       </Center>
