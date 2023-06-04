@@ -9,20 +9,31 @@ Bringing audiences to Bruin creators through unique user experiences.
 git clone https://github.com/onlybruins/onlybruins.com
 cd onlybruins.com
 ```
+
 #### [Install Node.js LTS](https://nodejs.org/en/download)
-
-On Ubuntu this looks like
-
+On Ubuntu,
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
-#### Install NPM packages
-From the repository root, run
+
+#### [Set up PostgreSQL](https://www.postgresql.org/download/)
+On Ubuntu,
 ```bash
-npm install
+sudo apt install postgresql postgresql-contrib
+sudo -u postgres createuser --superuser $USER
+createdb onlybruinsdb
 ```
-## Running Locally
+
+## Prepare to run latest code
+```bash
+git pull # get the latest code on main
+npm install
+sudo systemctl restart postgresql.service # On WSL, sudo service postgresql restart
+psql onlybruinsdb -f setup.sql # Update with latest schema. ⚠️THIS WILL DROP EXISTING DATA.
+```
+
+## Run Locally
 During development, for frontend (not backend!) hot-reloading run
 ```bash
 npm run --prefix backend build
@@ -33,7 +44,7 @@ Alternatively, to serve everything from the backend run
 npm start
 ```
 and navigate to http://localhost:8080.
-## Running in Production
+## Run in Production
 Ports below 1024 are privileged on Linux, but we need ports 80/443 to serve HTTP/HTTPS. Use this one-time setup to let Node use privileged ports:
 ```bash
 sudo setcap 'cap_net_bind_service=+ep' `which node`
