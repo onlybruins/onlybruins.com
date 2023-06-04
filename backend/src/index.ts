@@ -27,7 +27,12 @@ app.use(express.json())
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
 
+const regex_image_id_dot_extension = RegExp(/^[-a-z0-9]{36}\.[a-z]{3,4}$/);
 app.get('/images/:image_id_dot_extension', (req, res) => {
+  if (!regex_image_id_dot_extension.test(req.params.image_id_dot_extension)) {
+    res.status(404).send();
+    return;
+  }
   const a = req.params.image_id_dot_extension;
   const [first_two, rest] = [a.substring(0, 2), a.substring(2)];
   const p = path.resolve(__dirname, '../../ugc-images', `${first_two}/${rest}`);

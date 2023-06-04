@@ -76,7 +76,7 @@ export const addFollower = async (params: { creator_username: string, follower_u
   }
 }
 
-export const removeFollower = async (params: {creator_username: string, follower_username: string}) => {
+export const removeFollower = async (params: { creator_username: string, follower_username: string }) => {
   const res = await pool.query(
     `DELETE FROM subscriptions
     WHERE follower_id = (SELECT id FROM users WHERE username = $1)
@@ -91,8 +91,8 @@ export const removeFollower = async (params: {creator_username: string, follower
       FROM users
       WHERE username = $1 OR username = $2`,
       [params.follower_username, params.creator_username]);
-      // OK if the users exist (wasn't following to begin with), not OK otherwise
-      return res2.rows.length == 2;
+    // OK if the users exist (wasn't following to begin with), not OK otherwise
+    return res2.rows.length == 2;
   }
 }
 
@@ -153,4 +153,58 @@ export const validateCredentials = async (username: string, hashedPassword: stri
   if (res.rows.length === 0)
     return false
   return true
+}
+
+export const tipPost = async (params: { author_username: string, post_id: number, tipper_username: string, amount: number }): Promise<'ok' | 'already tipped' | 'bad username' | 'no such post'> => {
+  const client = await pool.connect();
+  client.query('BEGIN TRANSACTION');
+  const postExists = await client.query(
+    `SELECT 1
+    FROM posts
+    WHERE poster_id = (SELECT id FROM users WHERE username = $1)
+          AND post_id = $2`
+    , [params.author_username, params.post_id])
+    .then(res => res.rows.length > 0);
+  if (!postExists) {
+    client.query('ROLLBACK');
+    client.release();
+    return 'no such post';
+  }
+  const tipperExists = await client.query(
+    `SELECT 1 FROM users WHERE username = $1`, [params.tipper_username])
+    .then(res => res.rows.length > 0);
+  if (!tipperExists) {
+    client.query('ROLLBACK');
+    client.release();
+    return 'bad username';
+  }
+  const alreadyExisted = await client.query(
+    `SELECT 1
+    FROM tips
+    WHERE tipper_id = (SELECT id FROM users WHERE username = $1)
+          AND receiver_id = (SELECT id FROM users WHERE username = $2)
+          AND post_id = $3`, [params.tipper_username, params.author_username, params.post_id])
+    .then(res => res.rows.length > 0);
+  if (alreadyExisted) {
+    client.query('ROLLBACK');
+    client.release();
+    return 'already tipped';
+  }
+  // TODO: change account balances
+  const res1 = await client.query(
+    `INSERT INTO tips(tipper_id, receiver_id, post_id, amount)
+    VALUES(
+      (SELECT id FROM users WHERE username = $1),
+      (SELECT id FROM users WHERE username = $2),
+      $3,
+      $4)
+    RETURNING *`
+    , [params.tipper_username, params.author_username, params.post_id, params.amount]);
+  if (res1.rows.length !== 1) {
+    console.error(`bug: tipPost INSERT returned ${res1.rows.length} rows`);
+    console.error(params);
+  }
+  client.query('COMMIT');
+  client.release();
+  return 'ok';
 }

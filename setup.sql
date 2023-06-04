@@ -50,8 +50,11 @@ CREATE TABLE logins (
 );
 
 CREATE TABLE tips (
-  timestamp timestamp,
-  tipper_id int references users(id),
-  receiver_id int references users(id),
-  amount int
+  timestamp timestamptz NOT NULL default (now() at time zone 'utc'),
+  tipper_id int NOT NULL references users(id),
+  receiver_id int NOT NULL references users(id),
+  post_id int NOT NULL references posts(post_id),
+  amount int NOT NULL CHECK (amount > 0),
+  UNIQUE(tipper_id, receiver_id, post_id),
+  CHECK(tipper_id != receiver_id)
 );
