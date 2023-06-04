@@ -27,11 +27,11 @@ createdb onlybruinsdb
 We didn't implement database authentication. To let the server connect to Postgres, edit `/etc/postgresql/14/main/pg_hba.conf` (where 14 is your Postgres major version number) and change these lines:
 ```
 # IPV4 local connections:
-host    all             all             127.0.0.1/32            peer
+host    all             all             127.0.0.1/32            XXX
 # IPv6 local connections:
-host    all             all             ::1/128                 peer
+host    all             all             ::1/128                 XXX
 ```
-to read `trust` instead of `peer`.
+to read `trust` in place of XXX.
 
 ## Prepare to run latest code
 ```bash
