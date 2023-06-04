@@ -20,41 +20,32 @@ import {
   CardBody,
   Grid,
   Icon
-} from "@chakra-ui/react"
-import { ColorModeSwitcher } from "./ColorModeSwitcher"
-import { useState } from "react"
+} from "@chakra-ui/react";
+import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
 // import { Post } from "./Post";
 
-
-
 interface PostProps {
-  username: string,
-  postDate: string,
   imageUrl: string,
-//  tippedAmount?: number,
+  postDate: string,
+  username: string,
 }
 
-const Post = ({ user, image, date } : any) => {
-  const [username, setUsername] = useState(user);
-  const [imageUrl, setImageUrl] = useState(image);
-  const [postDate, setPostDate] = useState(date);
-  const [tippedAmt, setTippedAmt] = useState('');
+const Post = ({ imageUrl, postDate, username }: PostProps) => {
+  const [tippedAmount, setTippedAmount] = useState('');
   const [submit, setSubmit] = useState(false);
 
-  const handleChange = (event:any) => {
-    setTippedAmt(event.target.value)
-  }
-  
-  const handleSubmit = () => {
-    if(!isNaN(Number(tippedAmt)) && (Number(tippedAmt) > 0) ) {
-      setSubmit(!submit)
-    }
+  const handleChange = (event: any) => {
+    setTippedAmount(event.target.value);
   }
 
-  
+  const handleSubmit = () => {
+    if (!isNaN(Number(tippedAmount)) && (Number(tippedAmount) > 0)) {
+      setSubmit(!submit);
+    }
+  }
 
   return (
     <Card>
@@ -66,30 +57,29 @@ const Post = ({ user, image, date } : any) => {
         </Flex>
       </CardHeader>
       <CardBody>
-        <Image borderRadius="8px" boxSize="500px" src={imageUrl} />
+        <Image borderRadius="8px" boxSize="100%" src={imageUrl} mb="10px" />
         <InputGroup>
-          <InputLeftElement 
+          <InputLeftElement
             pointerEvents='none'
             color='gray.300'
             fontSize='1.2em'
-            children='$' 
+            children='$'
           />
-          <Input 
-            value={tippedAmt}
+          <Input
+            value={tippedAmount}
             onChange={handleChange}
             placeholder='How much would you like to tip?' />
           <InputRightElement width='4.5rem'>
-            {submit ? <Tooltip label={`You've tipped ${tippedAmt} bruinbux`} fontSize='md'>
-                       <Icon color="#c4aa7e" />
-                       </Tooltip> : 
-                       <Button h='1.75rem' size='sm'
-                               onClick={handleSubmit}>
-                          Tip
-                       </Button>            
+            {submit ? <Tooltip label={`You've tipped ${tippedAmount} bruinbux`} fontSize='md'>
+              <Icon color="#c4aa7e" />
+            </Tooltip> :
+              <Button h='1.75rem' size='sm'
+                onClick={handleSubmit}>
+                Tip
+              </Button>
             }
-          </InputRightElement>        
+          </InputRightElement>
         </InputGroup>
-
       </CardBody>
     </Card>
   )
@@ -113,10 +103,10 @@ const Feed = () => {
     >
       <VStack spacing={8}>
         {
-          posts.map(({ username, postDate, imageUrl }: PostProps) => (
-            <Post user={username}
-              date={postDate}
-              image={imageUrl} />
+          posts.map(({ username, postDate, imageUrl }) => (
+            <Post username={username}
+              postDate={postDate}
+              imageUrl={imageUrl} />
           ))
         }
       </VStack>
@@ -130,20 +120,12 @@ export const App = () => (
     <br />
     <Box fontSize="xl">
       <Center>
-        <VStack spacing={8} width={['100%', '80%', '60%', '40%']} />
-      </Center>  
+        <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
           <NewPost />
-    </Box>      
-    <Box textAlign="center" fontSize="xl"> 
-      <Center>   
-      <Grid minH="100vh" p={3}>
-        <ColorModeSwitcher justifySelf="flex-end" />
-        <VStack spacing={8}>
-          <Post user="@mzzzchael" date={'December 17, 1995 03:24:00'} image="https://www.tasteofhome.com/wp-content/uploads/2018/04/grilledcheesesocial-copy.jpg" />
-          <Post user="@tb" date={'December 17, 2021 03:24:00'} image="https://spoonuniversity.com/wp-content/uploads/sites/55/2016/01/FullSizeRender-4.jpg" />
+          <Post username="@mzzzchael" postDate={'December 17, 1995 03:24:00'} imageUrl="https://www.tasteofhome.com/wp-content/uploads/2018/04/grilledcheesesocial-copy.jpg" />
+          <Post username="@tb" postDate={'December 17, 2021 03:24:00'} imageUrl="https://spoonuniversity.com/wp-content/uploads/sites/55/2016/01/FullSizeRender-4.jpg" />
           <Feed />
         </VStack>
-      </Grid> 
       </Center>
     </Box>
   </ChakraProvider>
