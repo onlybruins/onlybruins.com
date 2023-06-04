@@ -83,7 +83,6 @@ export const getPost = async (username: string, post_id: number) => {
     JOIN users
     ON users.id = posts.poster_id
     WHERE users.username = $1 AND posts.post_id = $2`, [username, post_id]);
-  console.log('getPost:', res);
   if (res.rows.length === 0)
     return undefined;
   const { name, image_id, image_extension, timestamp } = res.rows[0];

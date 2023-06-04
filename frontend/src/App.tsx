@@ -23,10 +23,9 @@ import {
 } from "@chakra-ui/react"
 import { ColorModeSwitcher } from "./ColorModeSwitcher"
 import { useState } from "react"
-import InfiniteScroll from 'react-infinite-scroller';
-import FileUpload from './FileUpload';
-import { useForm } from "react-hook-form";
+import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
+import NewPost from "./NewPost";
 // import { Post } from "./Post";
 
 
@@ -122,30 +121,6 @@ const Feed = () => {
         }
       </VStack>
     </InfiniteScroll>
-  )
-}
-
-const NewPost = () => {
-  const {
-    handleSubmit,
-    register,
-    setError,
-    control,
-    formState: { errors, isSubmitting },
-  } = useForm()
-  return (
-    <Card width='100%'>
-      <FileUpload name="avatar"
-        acceptedFileTypes="image/*"
-        isRequired={true}
-        placeholder="Upload an image..."
-        control={control}>
-        Make a new post!
-      </FileUpload >
-      <Button type="submit">
-        Post
-      </Button>
-    </Card>
   )
 }
 

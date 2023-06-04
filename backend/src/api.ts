@@ -1,6 +1,9 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
 import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
+import multer from 'multer';
+import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
+import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
@@ -84,19 +87,31 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
     });
 });
 
-api.post('/users/:username/posts', async (req, res) => {
-  //TODO: get an image out of the request body,
-  //  set image_id to a generated GUID,
-  //  store the image to the filesystem,
-  //  call makePost with image_id and the appropriate file extension
-  const image_id = '924954e5-d2ae-4766-b0bf-c8a77b29b5d3';
-  const dbres = await makePost(req.params.username, image_id, 'png');
-  if (dbres === undefined)
-    res.status(404).send();
-  else
-    res.json({
-      post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`)
-    });
+const ugcUpload = multer({
+  storage: UgcStorage,
+  fileFilter: (req, file, callback) => callback(null, file.mimetype in supportedMimeTypeToFileExtension)
+}).single('postImage');
+api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
+  req.image_uuid = uuidv4();
+  ugcUpload(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send();
+      return;
+    }
+    if (!req.file) {
+      res.status(400).send();
+      return;
+    }
+    const dbres = await makePost(req.params.username, req.image_uuid, supportedMimeTypeToFileExtension[req.file.mimetype]);
+    if (dbres === undefined)
+      res.status(404).send();
+    else {
+      const post_endpoint = encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${dbres}`);
+      console.log(`New post from ${req.params.username}: ${post_endpoint}`);
+      res.json({ post_endpoint });
+    }
+  });
 });
 
 export default api;

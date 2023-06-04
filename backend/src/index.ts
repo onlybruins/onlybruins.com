@@ -5,6 +5,22 @@ import https from 'https';
 import http from 'http';
 import fs from 'fs';
 
+/* To give multer destinations for images, create subdirectories with all 2-letter alphanumeric values. */
+const alphanumeric = "abcdefghijklmnopqrstuvwxyz0123456789";
+const ugcDir = path.resolve(__dirname, '../../ugc-images');
+for (let i = 0; i < alphanumeric.length; i++) {
+  for (let j = 0; j < alphanumeric.length; j++) {
+    try {
+      fs.mkdirSync(path.join(ugcDir, alphanumeric[i] + alphanumeric[j]));
+    }
+    catch(e) {
+      if (e.code !== 'EEXIST') {
+        throw e;
+      }
+    }
+  }
+}
+
 const app = express();
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
