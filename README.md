@@ -35,10 +35,11 @@ to read `trust` in place of XXX.
 
 ## Prepare to run latest code
 ```bash
-git pull # get the latest code on main
+git pull # Get the latest code on main
 npm install
 sudo systemctl restart postgresql.service # On WSL, sudo service postgresql restart
 psql onlybruinsdb -f setup.sql # Update with latest schema. ⚠️THIS WILL DROP EXISTING DATA.
+rm ugc-images/*/* # Remove all post images, which are unreferenced after setup.sql cleared the tables
 ```
 
 ## Run Locally
