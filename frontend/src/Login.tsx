@@ -10,21 +10,37 @@ import {
   Input,
   VStack
 } from "@chakra-ui/react";
+import useAppStore from './appStore'
 
 export default function Reg() {
+
+  type FormValues = {
+    username: string;
+    password: string;
+  }
+
   const {
     handleSubmit,
     register,
     formState: { errors, isSubmitting, touchedFields },
-  } = useForm()
+  } = useForm<FormValues>()
 
-  function onSubmit(values: any) {
-    return new Promise((resolve: any) => {
-      setTimeout(() => {
-        alert(JSON.stringify(values, null, 2))
-        resolve()
-      }, 3000)
+  const signIn = useAppStore((state) => state.signIn);
+
+  const onSubmit = async (values: FormValues) => {
+    alert(JSON.stringify(values))
+    const resp = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify(values),
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      }
     })
+    if (resp.status === 200) {
+      signIn(values.username);
+    } else {
+      alert(`GOT ${resp.status}`)
+    }
   }
 
   return (
@@ -33,17 +49,17 @@ export default function Reg() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <VStack spacing={4} align="flex-start">
             <FormControl>
-              <FormLabel htmlFor="email">Email Address</FormLabel>
+              <FormLabel htmlFor="username">Username</FormLabel>
               <Input
-                id='email'
-                placeholder='email'
-                {...register('email', {
+                id='username'
+                placeholder='username'
+                {...register('username', {
                   required: 'This is required',
-                  minLength: { value: 4, message: 'Minimum length should be 4' },
+                  minLength: { value: 1, message: 'Should not be empty' },
                 })}
               />
               <FormErrorMessage>
-                {errors.email && <p role="alert">{errors.email?.message?.toString()}</p>}
+                {errors.username && <p role="alert">{errors.username?.message?.toString()}</p>}
               </FormErrorMessage>
             </FormControl>
             <FormControl isInvalid={!!errors.password && touchedFields.password}>

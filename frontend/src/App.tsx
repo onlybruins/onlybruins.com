@@ -11,6 +11,7 @@ import Nav from "./Nav";
 import NewPost from "./NewPost";
 import { Post } from "./Post";
 import Reg from "./Login";
+import useAppStore from './appStore'
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
@@ -42,18 +43,27 @@ const Feed = () => {
   )
 }
 
-export const App = () => (
-  <ChakraProvider theme={theme}>
-    <Nav />
-    <br />
-    <Box fontSize="xl">
-      <Center>
-        <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
-          <Reg />
-          <NewPost />
-          <Feed />
-        </VStack>
-      </Center>
-    </Box>
-  </ChakraProvider>
-)
+export const App = () => {
+  const username = useAppStore((state) => state.username);
+
+  return (
+    <ChakraProvider theme={theme}>
+      <Nav />
+      <br />
+      <Box fontSize="xl">
+        <Center>
+          <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
+            {username === undefined ?
+              <Reg />
+              :
+              <>
+                <NewPost />
+                <Feed />
+              </>
+            }
+          </VStack>
+        </Center>
+      </Box>
+    </ChakraProvider>
+  )
+}

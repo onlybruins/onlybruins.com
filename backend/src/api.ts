@@ -1,6 +1,7 @@
+import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
+import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost, validateCredentials } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -91,6 +92,7 @@ const ugcUpload = multer({
   storage: UgcStorage,
   fileFilter: (req, file, callback) => callback(null, file.mimetype in supportedMimeTypeToFileExtension)
 }).single('postImage');
+
 api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
   req.image_uuid = uuidv4();
   ugcUpload(req, res, async (err) => {
@@ -112,6 +114,17 @@ api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
       res.json({ post_endpoint });
     }
   });
+});
+
+
+api.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = SHA256(password).toString();
+  console.log(`unhashed: "${password}"`)
+  console.log(`  hashed: "${hashedPassword}"`)
+  const dbres = await validateCredentials(username, hashedPassword);
+  if (dbres) res.status(200).send();
+  else res.status(401).send();
 });
 
 export default api;

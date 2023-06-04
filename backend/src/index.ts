@@ -13,7 +13,7 @@ for (let i = 0; i < alphanumeric.length; i++) {
     try {
       fs.mkdirSync(path.join(ugcDir, alphanumeric[i] + alphanumeric[j]));
     }
-    catch(e) {
+    catch (e) {
       if (e.code !== 'EEXIST') {
         throw e;
       }
@@ -22,6 +22,8 @@ for (let i = 0; i < alphanumeric.length; i++) {
 }
 
 const app = express();
+
+app.use(express.json())
 
 app.use(express.static(path.resolve(__dirname, '../../frontend/build')));
 

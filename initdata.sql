@@ -4,7 +4,7 @@ INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VAL
   'micah',
   'michaellan202@gmail.com',
   'Michael Lan',
-  'mo jamba',
+  'f64f62a5954569dd1fa24d365ba40c06631186f39a4bbac41c840a3ba876da9c',
   944447,
   4
 );
@@ -13,7 +13,7 @@ INSERT INTO users(username, email, name, password_hash, balance, streak_cnt) VAL
   'T Omegalul M',
   'tombinford@ucla.edu',
   'Tom Binford',
-  'bruin bonanza',
+  'd9201d3705a24a4fe403920bb2cf2a4d933676f68f6eff90015a46f9693d2d0d',
   53,
   28
 );

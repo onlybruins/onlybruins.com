@@ -105,3 +105,13 @@ export const makePost = async (username: string, image_id: string, image_extensi
     return undefined;
   return res.rows[0].post_id;
 }
+
+export const validateCredentials = async (username: string, hashedPassword: string) => {
+  const res = await pool.query(
+    `SELECT username FROM users WHERE username = $1 AND password_hash = $2`,
+    [username, hashedPassword]);
+
+  if (res.rows.length === 0)
+    return false
+  return true
+}
