@@ -155,7 +155,7 @@ export const validateCredentials = async (username: string, hashedPassword: stri
   return true
 }
 
-export type TipPostResult = Promise<'ok' | 'already tipped' | 'bad username' | 'bad amount' | 'no such post' | 'insufficient funds'>;
+export type TipPostResult = Promise<'ok' | 'already tipped' | 'bad username' | 'bad amount' | 'no such post' | 'cannot tip yourself' | 'insufficient funds'>;
 export type TipPostParams = { author_username: string, post_id: number, tipper_username: string, amount: number };
 export const tipPost = async (params: TipPostParams): TipPostResult => {
   if (params.amount <= 0) {
@@ -182,6 +182,14 @@ export const tipPost = async (params: TipPostParams): TipPostResult => {
     client.query('ROLLBACK');
     client.release();
     return 'bad username';
+  }
+  const senderIsRecipient = await client.query(
+    `SELECT 1 FROM users WHERE username = $1 OR username = $2`, [params.tipper_username, params.author_username])
+    .then(res => res.rows.length < 2);
+  if (senderIsRecipient) {
+    client.query('ROLLBACK');
+    client.release();
+    return 'cannot tip yourself';
   }
   const alreadyExisted = await client.query(
     `SELECT 1
