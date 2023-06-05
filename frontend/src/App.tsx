@@ -4,8 +4,9 @@ import {
   VStack,
   theme,
   Center,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
@@ -88,9 +89,41 @@ const Feed = () => {
   )
 }
 
+type Notification = {
+  timestamp: string,
+  message: string,
+}
+
+const pollNotifications = async (username: string, toast: CallableFunction) => {
+  fetch(encodeURI(`/api/users/${username}/poll-notifications`), {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then((notifs: Notification[]) =>
+      notifs.forEach(f => {
+        console.log(`got a notification: ${f.message}`)
+        toast({
+          status: 'info',
+          position: 'bottom-right',
+          title: f.message,
+        });
+      }));
+}
+
 export const App = () => {
   const username = useAppStore((state) => state.username);
   const authUI = useAppStore((state) => state.authUI);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (username === undefined) {
+      return;
+    }
+    const timeoutId = setInterval(() => {
+      pollNotifications(username, toast);
+    }, 500);
+    return () => { clearInterval(timeoutId); };
+  }, [username, toast]);
 
   /* return (
      <Profile />
