@@ -8,16 +8,17 @@ import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
-interface FakePost {
+interface Post {
   post_endpoint: string,
   poster_name: string,
   poster_username: string,
   image_endpoint: string,
   timestamp: string,
   tippedAmount?: number,
+  tip_endpoint: string,
 }
 
-function createRandomFakePost(): FakePost {
+function createRandomFakePost(): Post {
   const poster_name = faker.name.firstName();
   const poster_username = faker.internet.userName();
   const timestamp = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
@@ -31,6 +32,7 @@ function createRandomFakePost(): FakePost {
     image_endpoint,
     timestamp: timestamp.toISOString(),
     tippedAmount,
+    tip_endpoint: 'fake-post-cannot-tip',
   };
 }
 
@@ -82,12 +84,13 @@ api.get('/users/:username/posts', async (req, res) => {
   if (dbres === undefined)
     res.status(404).send();
   else
-    res.json(dbres.map(post => ({
+    res.json(dbres.map((post): Post => ({
       post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}`),
       poster_name: post.name,
       poster_username: post.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
-      timestamp: post.timestamp
+      timestamp: post.timestamp,
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tip`),
     })));
 });
 
@@ -101,7 +104,8 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
       poster_name: post.name,
       poster_username: req.params.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
-      timestamp: post.timestamp
+      timestamp: post.timestamp,
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tip`),
     });
 });
 
