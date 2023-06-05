@@ -14,6 +14,7 @@ import Post from "./Post";
 import useAppStore from './appStore'
 import Register from "./Register";
 import Login from "./Login";
+import { CurrencyCircleDollar } from "phosphor-react";
 import Profile from "./ProfilePage"
 
 interface BackendPost {
@@ -92,6 +93,7 @@ const Feed = () => {
 type Notification = {
   timestamp: string,
   message: string,
+  kind: 'money' | 'info',
 }
 
 const pollNotifications = async (username: string, toast: CallableFunction) => {
@@ -102,7 +104,9 @@ const pollNotifications = async (username: string, toast: CallableFunction) => {
     .then((notifs: Notification[]) =>
       notifs.forEach(f => {
         toast({
-          status: 'info',
+          // hack: use warning to get yellow coin-like color
+          status: f.kind === 'money' ? 'warning' : 'info',
+          icon: f.kind === 'money' ? <CurrencyCircleDollar size="24px" /> : undefined,
           position: 'bottom-right',
           title: f.message,
         });
