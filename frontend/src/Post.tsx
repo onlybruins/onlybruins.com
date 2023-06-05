@@ -1,19 +1,20 @@
 import {
   Heading,
-  HStack,
   Image,
   Tooltip,
   Flex,
   Spacer,
   Input,
   InputLeftElement,
-  InputRightElement,
   InputGroup,
-  Icon,
   Button,
+  useColorModeValue,
+  HStack,
+  Text,
+  useToken,
 } from "@chakra-ui/react"
-import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
-import { Coins, CurrencyCircleDollar } from "phosphor-react"
+import { Card, CardHeader, CardBody } from '@chakra-ui/react'
+import { ArrowCircleRight, Coins, CurrencyCircleDollar } from "phosphor-react"
 import { useState } from "react";
 
 interface PostProps {
@@ -23,16 +24,20 @@ interface PostProps {
 }
 
 const Post = ({ imageUrl, postDate, username }: PostProps) => {
-  const [tippedAmount, setTippedAmount] = useState('');
-  const [submit, setSubmit] = useState(false);
+  const [tipField, setTipField] = useState('');
+  const [tip, setTip] = useState<number | undefined>(undefined);
+  const color = useColorModeValue('yellow.600', 'yellow.400')
+  const [rgb] = useToken('colors', [color])
 
   const handleChange = (event: any) => {
-    setTippedAmount(event.target.value);
+    setTipField(event.target.value);
   }
 
   const handleSubmit = () => {
-    if (!isNaN(Number(tippedAmount)) && (Number(tippedAmount) > 0)) {
-      setSubmit(!submit);
+    const n = Number(tipField)
+    /* TODO: check if has enough in balance */
+    if (!isNaN(n) && n > 0) {
+      setTip(n);
     }
   }
 
@@ -47,30 +52,39 @@ const Post = ({ imageUrl, postDate, username }: PostProps) => {
       </CardHeader>
       <CardBody>
         <Image borderRadius="8px" boxSize="100%" src={imageUrl} mb="10px" />
-        <InputGroup>
-          <InputLeftElement
-            pointerEvents='none'
-            color='gray.300'
-            fontSize='1.2em'
-            children='$'
-          />
-          <Input
-            value={tippedAmount}
-            onChange={handleChange}
-            placeholder='How much would you like to tip?' />
-          <InputRightElement width='4.5rem'>
-            {submit ?
-              <Tooltip label={`You've tipped ${tippedAmount} bruinbux`} fontSize='md'>
-                <Icon color="#c4aa7e" />
-              </Tooltip>
+        <HStack>
+          <InputGroup>
+            <InputLeftElement
+              pointerEvents='none'
+              color='gray.300'
+              children={
+                <CurrencyCircleDollar
+                  size="1.5rem"
+                  weight={tip === undefined ? "regular" : "duotone"}
+                  color={rgb}
+                />
+              }
+            />
+            {tip === undefined ?
+              <Input
+                value={tipField}
+                onChange={handleChange}
+                placeholder='How much would you like to tip?'
+              />
               :
-              <Button h='1.75rem' size='sm'
-                onClick={handleSubmit}>
-                Tip
-              </Button>
+              <Input
+                value={`You've tipped ${tip} bruinbux`}
+                disabled
+              />
             }
-          </InputRightElement>
-        </InputGroup>
+          </InputGroup>
+          {tip === undefined &&
+            <Button
+              onClick={handleSubmit}>
+              <ArrowCircleRight weight="fill" size="1.5rem" />
+            </Button>
+          }
+        </HStack>
       </CardBody>
     </Card>
   )
