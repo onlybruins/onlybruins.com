@@ -4,22 +4,6 @@ import {
   VStack,
   theme,
   Center,
-  Heading,
-  HStack,
-  Image,
-  Tooltip,
-  Flex,
-  Spacer,
-  Input,
-  InputLeftElement,
-  InputRightElement,
-  InputGroup,
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  Grid,
-  Icon
 } from "@chakra-ui/react";
 import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
@@ -28,8 +12,6 @@ import NewPost from "./NewPost";
 import Post from "./Post";
 import Reg from "./Login";
 import useAppStore from './appStore'
-// import { Post } from "./Post";
-
 
 interface BackendPost {
   post_endpoint: string,
