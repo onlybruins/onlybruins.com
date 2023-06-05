@@ -30,8 +30,10 @@ CREATE TABLE users (
 );
 
 CREATE TABLE subscriptions (
-  follower_id int references users(id),
-  creator_id  int references users(id)
+  follower_id int NOT NULL references users(id),
+  creator_id  int NOT NULL references users(id),
+  UNIQUE(follower_id, creator_id),
+  CHECK(follower_id != creator_id)
 );
 
 CREATE TABLE posts (

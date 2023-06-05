@@ -3,18 +3,45 @@ import {
   Box,
   VStack,
   theme,
-  Center
+  Center,
+  Heading,
+  HStack,
+  Image,
+  Tooltip,
+  Flex,
+  Spacer,
+  Input,
+  InputLeftElement,
+  InputRightElement,
+  InputGroup,
+  Button,
+  Card,
+  CardHeader,
+  CardBody,
+  Grid,
+  Icon
 } from "@chakra-ui/react";
-import { useState } from "react"
+import { useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
-import { Post } from "./Post";
+import Post from "./Post";
 import Reg from "./Login";
 import useAppStore from './appStore'
+// import { Post } from "./Post";
+
+
+interface BackendPost {
+  post_endpoint: string,
+  poster_name: string,
+  poster_username: string,
+  image_endpoint: string,
+  timestamp: string,
+  tippedAmount?: number,
+}
 
 const Feed = () => {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<BackendPost[]>([]);
 
   const fetchData = () => {
     const endpoint = '/api/fakePosts';
@@ -31,11 +58,10 @@ const Feed = () => {
     >
       <VStack spacing={8}>
         {
-          posts.map(({ username, postDate, imageUrl, tippedAmount }) => (
-            <Post username={username}
-              postDate={postDate}
-              imageUrl={imageUrl}
-              tippedAmount={tippedAmount} />
+          posts.map(({ image_endpoint, poster_username, timestamp }) => (
+            <Post username={poster_username}
+              postDate={timestamp}
+              imageUrl={image_endpoint} />
           ))
         }
       </VStack>

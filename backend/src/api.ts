@@ -1,31 +1,36 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost, validateCredentials } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
-class FakePost {
-  username: string;
-  postDate: Date;
-  imageUrl: string;
-  tippedAmount?: number;
+interface FakePost {
+  post_endpoint: string,
+  poster_name: string,
+  poster_username: string,
+  image_endpoint: string,
+  timestamp: string,
+  tippedAmount?: number,
 }
 
 function createRandomFakePost(): FakePost {
-  const username = faker.internet.userName();
-  const postDate = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
-  const imageUrl = faker.image.fashion(1280, 720, true);
-  const tippedAmount = faker.helpers.arrayElement([undefined, faker.datatype.number(100)])
+  const poster_name = faker.name.firstName();
+  const poster_username = faker.internet.userName();
+  const timestamp = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
+  const image_endpoint = faker.image.fashion(1280, 720, true);
+  const tippedAmount = faker.helpers.arrayElement([null, faker.datatype.number(100)])
 
   return {
-    username,
-    postDate,
-    imageUrl,
-    tippedAmount
+    post_endpoint: null,
+    poster_name,
+    poster_username,
+    image_endpoint,
+    timestamp: timestamp.toISOString(),
+    tippedAmount,
   };
 }
 
@@ -58,6 +63,18 @@ api.get('/users/:username/following', async (req, res) => {
     res.json("No associated user found");
   else
     res.json(dbres);
+});
+
+api.put('/users/:username/following/:creator_username', async (req, res) => {
+  const dbres = await addFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
+  console.log(`${req.params.username} following ${req.params.creator_username}: ${dbres}`);
+  res.status(dbres ? 200 : 400).send();
+});
+
+api.delete('/users/:username/following/:creator_username', async (req, res) => {
+  const dbres = await removeFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
+  console.log(`${req.params.username} unfollowing ${req.params.creator_username}: ${dbres}`);
+  res.status(dbres ? 200 : 400).send();
 });
 
 api.get('/users/:username/posts', async (req, res) => {
@@ -115,7 +132,6 @@ api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
     }
   });
 });
-
 
 api.post('/login', async (req, res) => {
   const { username, password } = req.body;
