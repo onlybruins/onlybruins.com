@@ -1,6 +1,6 @@
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, getPosts, getPost, makePost } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, getPosts, getPost, makePost } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -62,6 +62,18 @@ api.get('/users/:username/following', async (req, res) => {
     res.json("No associated user found");
   else
     res.json(dbres);
+});
+
+api.put('/users/:username/following/:creator_username', async (req, res) => {
+  const dbres = await addFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
+  console.log(`${req.params.username} following ${req.params.creator_username}: ${dbres}`);
+  res.status(dbres ? 200 : 400).send();
+});
+
+api.delete('/users/:username/following/:creator_username', async (req, res) => {
+  const dbres = await removeFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
+  console.log(`${req.params.username} unfollowing ${req.params.creator_username}: ${dbres}`);
+  res.status(dbres ? 200 : 400).send();
 });
 
 api.get('/users/:username/posts', async (req, res) => {
