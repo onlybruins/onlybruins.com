@@ -1,7 +1,7 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -90,7 +90,7 @@ api.get('/users/:username/posts', async (req, res) => {
       poster_username: post.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
       timestamp: post.timestamp,
-      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tip`),
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tips`),
     })));
 });
 
@@ -105,11 +105,11 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
       poster_username: req.params.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
       timestamp: post.timestamp,
-      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tip`),
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tips`),
     });
 });
 
-api.post('/users/:username/posts/:postid(\\d+)/tip', express.json(), async (req, res) => {
+api.post('/users/:username/posts/:postid(\\d+)/tips', express.json(), async (req, res) => {
   if (!req.body.tipper_username
     || !req.body.amount
     || typeof req.body.amount !== "number"
@@ -131,6 +131,18 @@ api.post('/users/:username/posts/:postid(\\d+)/tip', express.json(), async (req,
   else {
     res.status(400).json(dbres);
   }
+});
+
+api.get('/users/:username/posts/:postid(\\d+)/tips/:tipper_username', async (req, res) => {
+  const dbres = await getTipAmount({
+    author_username: req.params.username,
+    tipper_username: req.params.tipper_username,
+    post_id: Number(req.params.postid),
+  });
+  if (dbres === undefined)
+    res.status(404).send();
+  else
+    res.json(dbres);
 });
 
 const ugcUpload = multer({

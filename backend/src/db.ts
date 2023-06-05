@@ -248,3 +248,17 @@ export const tipPost = async (params: TipPostParams): TipPostResult => {
   client.release();
   return 'ok';
 }
+
+export const getTipAmount = async (params: { author_username: string, tipper_username: string, post_id: number }) => {
+  const res = await pool.query(
+    `SELECT amount
+    FROM tips
+    WHERE receiver_id = (SELECT id FROM users WHERE username = $1)
+          AND post_id = $2
+          AND tipper_id = (SELECT id FROM users WHERE username = $3)`
+    , [params.author_username, params.post_id, params.tipper_username]);
+  if (res.rows.length === 0) {
+    return undefined;
+  }
+  return res.rows[0];
+}
