@@ -101,7 +101,6 @@ const pollNotifications = async (username: string, toast: CallableFunction) => {
     .then(res => res.json())
     .then((notifs: Notification[]) =>
       notifs.forEach(f => {
-        console.log(`got a notification: ${f.message}`)
         toast({
           status: 'info',
           position: 'bottom-right',
@@ -120,7 +119,9 @@ export const App = () => {
       return;
     }
     const timeoutId = setInterval(() => {
-      pollNotifications(username, toast);
+      if (username !== undefined) {
+        pollNotifications(username, toast);
+      }
     }, 500);
     return () => { clearInterval(timeoutId); };
   }, [username, toast]);
