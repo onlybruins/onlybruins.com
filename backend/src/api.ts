@@ -87,7 +87,7 @@ api.put('/users/:username/following/:creator_username', async (req, res) => {
   const dbres = await addFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
   console.log(`${req.params.username} following ${req.params.creator_username}: ${dbres}`);
   if (dbres === 'ok') {
-    await addNotification(req.params.creator_username, `New follower: @${req.params.username}`);
+    await addNotification(req.params.creator_username, 'info', `New follower: @${req.params.username}`);
     res.status(200).send();
   }
   else {
@@ -160,6 +160,7 @@ api.post('/users/:username/posts/:postid(\\d+)/tips', express.json(), async (req
   if (dbres === "ok") {
     const tipped_post_endpoint = `${req.baseUrl}/users/${req.params.username}/posts/${req.params.postid}`;
     console.log(`User ${req.body.tipper_username} tipped ${req.body.amount} to ${tipped_post_endpoint}`);
+    await addNotification(req.params.username, 'money', `Got ${req.body.amount} bruinbux from @${req.body.tipper_username}`);
     res.status(200).send();
   }
   else {

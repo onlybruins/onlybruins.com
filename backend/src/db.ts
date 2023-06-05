@@ -310,7 +310,7 @@ export const pollNotificationsOf = async (username: string): Promise<Notificatio
       FROM users
       WHERE username = $1
     )
-    SELECT timestamp, message
+    SELECT timestamp, message, kind
     FROM notifications, user_
     WHERE notified_user_id = user_.id
           AND (user_.last_checked_notifications IS NULL
@@ -325,13 +325,13 @@ export const pollNotificationsOf = async (username: string): Promise<Notificatio
   return res.rows;
 }
 
-export const addNotification = async (username: string, message: string) => {
+export const addNotification = async (username: string, kind: 'money' | 'info', message: string) => {
   const res = await pool.query(
-    `INSERT INTO notifications(notified_user_id, message)
-    VALUES((SELECT id FROM users WHERE username = $1), $2)
+    `INSERT INTO notifications(notified_user_id, message, kind)
+    VALUES((SELECT id FROM users WHERE username = $1), $2, $3)
     ON CONFLICT DO NOTHING
     RETURNING *`
-    , [username, message]);
+    , [username, message, kind]);
     if (res.rows.length === 1) {
       return true;
     }

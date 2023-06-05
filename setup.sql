@@ -63,5 +63,6 @@ CREATE TABLE tips (
 CREATE TABLE notifications (
   timestamp timestamptz NOT NULL default (now() at time zone 'utc'),
   notified_user_id int NOT NULL references users(id),
-  message varchar(1000) NOT NULL
+  message varchar(1000) NOT NULL,
+  kind varchar(50) NOT NULL
 );
