@@ -15,30 +15,26 @@ import {
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody } from '@chakra-ui/react'
 import { ArrowCircleRight, Coins, CurrencyCircleDollar } from "phosphor-react"
-import { useState } from "react";
+import { useRef } from "react";
 import moment from "moment";
 
 interface PostProps {
   imageUrl: string,
   postDate: string,
+  setTipAmount: (amount: number) => void,
+  tipAmount?: number,
   username: string,
 }
 
-const Post = ({ imageUrl, postDate, username }: PostProps) => {
-  const [tipField, setTipField] = useState('');
-  const [tip, setTip] = useState<number | undefined>(undefined);
+const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const color = useColorModeValue('yellow.600', 'yellow.400')
   const [rgb] = useToken('colors', [color])
 
-  const handleChange = (event: any) => {
-    setTipField(event.target.value);
-  }
-
   const handleSubmit = () => {
-    const n = Number(tipField)
-    /* TODO: check if has enough in balance */
+    const n = Number(inputRef.current?.value);
     if (!isNaN(n) && n > 0) {
-      setTip(n);
+      setTipAmount(n);
     }
   }
 
@@ -62,29 +58,28 @@ const Post = ({ imageUrl, postDate, username }: PostProps) => {
               color='gray.300'
               children={
                 <CurrencyCircleDollar
-                  size="1.5rem"
-                  weight={tip === undefined ? "regular" : "duotone"}
+                  size="24px"
+                  weight={tipAmount === undefined ? "regular" : "duotone"}
                   color={rgb}
                 />
               }
             />
-            {tip === undefined ?
+            {tipAmount === undefined ?
               <Input
-                value={tipField}
-                onChange={handleChange}
                 placeholder='How much would you like to tip?'
+                ref={inputRef}
               />
               :
               <Input
-                value={`You've tipped ${tip} bruinbux`}
+                placeholder={`You've tipped ${tipAmount} bruinbux`}
                 disabled
               />
             }
           </InputGroup>
-          {tip === undefined &&
+          {tipAmount === undefined &&
             <Button
               onClick={handleSubmit}>
-              <ArrowCircleRight weight="fill" size="1.5rem" />
+              <ArrowCircleRight weight="fill" size="24px" />
             </Button>
           }
         </HStack>
