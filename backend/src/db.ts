@@ -155,7 +155,12 @@ export const validateCredentials = async (username: string, hashedPassword: stri
   return true
 }
 
-export const tipPost = async (params: { author_username: string, post_id: number, tipper_username: string, amount: number }): Promise<'ok' | 'already tipped' | 'bad username' | 'no such post'> => {
+export type TipPostResult = Promise<'ok' | 'already tipped' | 'bad username' | 'bad amount' | 'no such post' | 'insufficient funds'>;
+export type TipPostParams = { author_username: string, post_id: number, tipper_username: string, amount: number };
+export const tipPost = async (params: TipPostParams): TipPostResult => {
+  if (params.amount <= 0) {
+    return 'bad amount';
+  }
   const client = await pool.connect();
   client.query('BEGIN TRANSACTION');
   const postExists = await client.query(
@@ -190,8 +195,35 @@ export const tipPost = async (params: { author_username: string, post_id: number
     client.release();
     return 'already tipped';
   }
-  // TODO: change account balances
+  const sufficientFunds = await client.query(
+    `SELECT balance
+    FROM users
+    WHERE username = $1`, [params.tipper_username])
+    .then(res => res.rows[0].balance >= params.amount);
+  if (!sufficientFunds) {
+    client.query('ROLLBACK');
+    client.release();
+    return 'insufficient funds';
+  }
   const res1 = await client.query(
+    `UPDATE users
+    SET balance = balance - $1
+    WHERE username = $2
+    RETURNING *`, [params.amount, params.tipper_username]);
+  if (res1.rows.length !== 1) {
+    console.error(`bug: tipPost UPDATE tipper returned ${JSON.stringify(res1)}`);
+    console.error(params);
+  }
+  const res2 = await client.query(
+    `UPDATE users
+    SET balance = balance + $1
+    WHERE username = $2
+    RETURNING *`, [params.amount, params.author_username]);
+  if (res2.rows.length !== 1) {
+    console.error(`bug: tipPost UPDATE author returned ${JSON.stringify(res2)}`);
+    console.error(params);
+  }
+  const res3 = await client.query(
     `INSERT INTO tips(tipper_id, receiver_id, post_id, amount)
     VALUES(
       (SELECT id FROM users WHERE username = $1),
@@ -200,8 +232,8 @@ export const tipPost = async (params: { author_username: string, post_id: number
       $4)
     RETURNING *`
     , [params.tipper_username, params.author_username, params.post_id, params.amount]);
-  if (res1.rows.length !== 1) {
-    console.error(`bug: tipPost INSERT returned ${res1.rows.length} rows`);
+  if (res3.rows.length !== 1) {
+    console.error(`bug: tipPost INSERT returned ${res3.rows.length} rows`);
     console.error(params);
   }
   client.query('COMMIT');

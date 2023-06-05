@@ -1,7 +1,7 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -103,6 +103,30 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
       timestamp: post.timestamp
     });
+});
+
+api.post('/users/:username/posts/:postid(\\d+)/tip', express.json(), async (req, res) => {
+  if (!req.body.tipper_username
+    || !req.body.amount
+    || typeof req.body.amount !== "number"
+    || req.body.amount <= 0) {
+    res.status(400).send();
+    return;
+  }
+  const dbres = await tipPost({
+    author_username: req.params.username,
+    tipper_username: req.body.tipper_username,
+    post_id: Number(req.params.postid),
+    amount: req.body.amount,
+  });
+  if (dbres === "ok") {
+    const tipped_post_endpoint = `${req.baseUrl}/users/${req.params.username}/posts/${req.params.postid}`;
+    console.log(`User ${req.body.tipper_username} tipped ${req.body.amount} to ${tipped_post_endpoint}`);
+    res.status(200).send();
+  }
+  else {
+    res.status(400).json(dbres);
+  }
 });
 
 const ugcUpload = multer({
