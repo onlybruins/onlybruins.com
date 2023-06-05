@@ -316,6 +316,7 @@ export const pollNotificationsOf = async (username: string): Promise<Notificatio
           AND (user_.last_checked_notifications IS NULL
                OR user_.last_checked_notifications < timestamp)`
     , [username]);
+  // TODO: fix race condition that could cause a notification made at this point to be missed
   await pool.query(
     `UPDATE users
     SET last_checked_notifications = now() at time zone 'utc'
