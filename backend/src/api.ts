@@ -16,6 +16,7 @@ import {
   registerUser,
   pollNotificationsOf,
   getFeed,
+  addNotification,
 } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
@@ -85,7 +86,13 @@ api.get('/users/:username/following', async (req, res) => {
 api.put('/users/:username/following/:creator_username', async (req, res) => {
   const dbres = await addFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
   console.log(`${req.params.username} following ${req.params.creator_username}: ${dbres}`);
-  res.status(dbres ? 200 : 400).send();
+  if (dbres === 'ok') {
+    await addNotification(req.params.creator_username, `New follower: @${req.params.username}`);
+    res.status(200).send();
+  }
+  else {
+    res.status(400).json(dbres);
+  }
 });
 
 api.delete('/users/:username/following/:creator_username', async (req, res) => {

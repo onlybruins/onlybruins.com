@@ -56,14 +56,15 @@ export const getFollowing = async (username: string) => {
     .then(res => res.rows.map(r => r.username));
 }
 
-export const addFollower = async (params: { creator_username: string, follower_username: string }) => {
+type AddFollowerResult = Promise<'ok' | 'already following' | 'bad username'>;
+export const addFollower = async (params: { creator_username: string, follower_username: string }): AddFollowerResult => {
   const res = await pool.query(
     `INSERT INTO subscriptions(follower_id, creator_id)
     VALUES((SELECT id FROM users WHERE username = $1), (SELECT id FROM users WHERE username = $2))
-    ON CONFLICT DO NOTHING`, [params.follower_username, params.creator_username]);
+    ON CONFLICT DO NOTHING
+    RETURNING *`, [params.follower_username, params.creator_username]);
   if (res.rows.length > 0) {
-    // successfully followed
-    return true;
+    return 'ok';
   }
   else {
     const res2 = await pool.query(
@@ -71,8 +72,7 @@ export const addFollower = async (params: { creator_username: string, follower_u
       FROM users
       WHERE username = $1 OR username = $2`,
       [params.follower_username, params.creator_username]);
-    // OK if the users exist (attempted to follow again), not OK otherwise
-    return res2.rows.length == 2;
+    return res2.rows.length == 2 ? 'already following' : 'bad username';
   }
 }
 
