@@ -7,24 +7,29 @@ import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
-class FakePost {
-  username: string;
-  postDate: Date;
-  imageUrl: string;
-  tippedAmount?: number;
+interface FakePost {
+  post_endpoint: string,
+  poster_name: string,
+  poster_username: string,
+  image_endpoint: string,
+  timestamp: string,
+  tippedAmount?: number,
 }
 
 function createRandomFakePost(): FakePost {
-  const username = faker.internet.userName();
-  const postDate = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
-  const imageUrl = faker.image.fashion(1280, 720, true);
-  const tippedAmount = faker.helpers.arrayElement([undefined, faker.datatype.number(100)])
+  const poster_name = faker.name.firstName();
+  const poster_username = faker.internet.userName();
+  const timestamp = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
+  const image_endpoint = faker.image.fashion(1280, 720, true);
+  const tippedAmount = faker.helpers.arrayElement([null, faker.datatype.number(100)])
 
   return {
-    username,
-    postDate,
-    imageUrl,
-    tippedAmount
+    post_endpoint: null,
+    poster_name,
+    poster_username,
+    image_endpoint,
+    timestamp: timestamp.toISOString(),
+    tippedAmount,
   };
 }
 
