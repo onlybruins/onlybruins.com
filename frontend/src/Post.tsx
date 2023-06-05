@@ -16,6 +16,7 @@ import {
 import { Card, CardHeader, CardBody } from '@chakra-ui/react'
 import { ArrowCircleRight, Coins, CurrencyCircleDollar } from "phosphor-react"
 import { useState } from "react";
+import moment from "moment";
 
 interface PostProps {
   imageUrl: string,
@@ -41,13 +42,15 @@ const Post = ({ imageUrl, postDate, username }: PostProps) => {
     }
   }
 
+  const dateString = moment(postDate).fromNow();
+
   return (
     <Card>
       <CardHeader paddingBottom="0px">
         <Flex>
           <Heading textAlign='left' size='sm'>{username}</Heading>
           <Spacer />
-          <Heading textAlign='left' size='sm' fontWeight='normal' color="grey">{postDate}</Heading>
+          <Heading textAlign='left' size='sm' fontWeight='normal' color="grey">{dateString}</Heading>
         </Flex>
       </CardHeader>
       <CardBody>
