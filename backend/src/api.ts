@@ -23,7 +23,7 @@ function createRandomFakePost(): Post {
   const poster_username = faker.internet.userName();
   const timestamp = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
   const image_endpoint = faker.image.fashion(1280, 720, true);
-  const tippedAmount = faker.helpers.arrayElement([null, faker.datatype.number(100)])
+  const tippedAmount = faker.helpers.arrayElement([undefined, faker.datatype.number(100)]);
 
   return {
     post_endpoint: null,
