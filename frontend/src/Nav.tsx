@@ -14,7 +14,8 @@ import {
   MenuList,
   Stack,
   useColorModeValue,
-  useDisclosure
+  useDisclosure,
+  Image
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
@@ -25,7 +26,14 @@ export default function Nav() {
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-          <Box>Logo</Box>
+          <Box>
+            <Image
+              boxSize='65px'
+              borderRadius='full'
+              src='https://live.staticflickr.com/65535/52951645298_0e2808d445_n.jpg'
+              alt='logo'
+            />
+          </Box>
 
 
           <Flex alignItems={'center'}>
