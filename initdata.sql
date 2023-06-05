@@ -39,5 +39,10 @@ FROM users u1
 CROSS JOIN users u2
 WHERE u1.username = 'micah' AND u2.username = 'naketris';
 
+INSERT INTO notifications(notified_user_id, message) VALUES (
+  (SELECT id FROM users WHERE username = 'T Omegalul M'),
+  'New follower: @naketris'
+);
+
 SELECT * FROM users;
 SELECT * FROM subscriptions;

@@ -290,3 +290,36 @@ export const getTipAmount = async (params: { author_username: string, tipper_use
   }
   return res.rows[0];
 }
+
+export type Notification = {
+  timestamp: string,
+  message: string,
+}
+
+export const pollNotificationsOf = async (username: string): Promise<Notification[] | undefined> => {
+  const userExists = await pool.query(
+    `SELECT 1 FROM users WHERE username = $1`
+    , [username])
+    .then(res => res.rows.length > 0);
+  if (!userExists) {
+    return undefined;
+  }
+  const res = await pool.query(
+    `WITH user_ AS (
+      SELECT id, last_checked_notifications
+      FROM users
+      WHERE username = $1
+    )
+    SELECT timestamp, message
+    FROM notifications, user_
+    WHERE notified_user_id = user_.id
+          AND (user_.last_checked_notifications IS NULL
+               OR user_.last_checked_notifications < timestamp)`
+    , [username]);
+  await pool.query(
+    `UPDATE users
+    SET last_checked_notifications = now() at time zone 'utc'
+    WHERE username = $1`
+    , [username]);
+  return res.rows;
+}

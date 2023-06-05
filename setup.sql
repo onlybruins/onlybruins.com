@@ -26,7 +26,8 @@ CREATE TABLE users (
   name          varchar(80),
   password_hash varchar(80),
   balance       int,
-  streak_cnt    int
+  streak_cnt    int,
+  last_checked_notifications timestamptz NULL
 );
 
 CREATE TABLE subscriptions (
@@ -57,4 +58,10 @@ CREATE TABLE tips (
   amount int NOT NULL CHECK (amount > 0),
   UNIQUE(tipper_id, receiver_id, post_id),
   CHECK(tipper_id != receiver_id)
+);
+
+CREATE TABLE notifications (
+  timestamp timestamptz NOT NULL default (now() at time zone 'utc'),
+  notified_user_id int NOT NULL references users(id),
+  message varchar(1000) NOT NULL
 );
