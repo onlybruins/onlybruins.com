@@ -323,3 +323,16 @@ export const pollNotificationsOf = async (username: string): Promise<Notificatio
     , [username]);
   return res.rows;
 }
+
+export const addNotification = async (username: string, message: string) => {
+  const res = await pool.query(
+    `INSERT INTO notifications(notified_user_id, message)
+    VALUES((SELECT id FROM users WHERE username = $1), $2)
+    ON CONFLICT DO NOTHING
+    RETURNING *`
+    , [username, message]);
+    if (res.rows.length === 1) {
+      return true;
+    }
+    return false;
+}
