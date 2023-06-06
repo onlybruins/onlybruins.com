@@ -13,6 +13,7 @@ import Post from "./Post";
 import useAppStore from './appStore'
 import Register from "./Register";
 import Login from "./Login";
+import Profile from "./ProfilePage"
 
 interface BackendPost {
   post_endpoint: string,
@@ -91,7 +92,10 @@ export const App = () => {
   const username = useAppStore((state) => state.username);
   const authUI = useAppStore((state) => state.authUI);
 
-  return (
+ /* return (
+    <Profile />
+  ) */
+ return (
     <ChakraProvider theme={theme}>
       <Nav />
       <br />
