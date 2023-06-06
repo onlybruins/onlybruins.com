@@ -1,7 +1,6 @@
 import {
   Heading,
   Image,
-  Tooltip,
   Flex,
   Spacer,
   Input,
@@ -10,12 +9,11 @@ import {
   Button,
   useColorModeValue,
   HStack,
-  Text,
   useToken,
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody } from '@chakra-ui/react'
-import { ArrowCircleRight, Coins, CurrencyCircleDollar } from "phosphor-react"
-import { useRef } from "react";
+import { ArrowCircleRight, CurrencyCircleDollar } from "phosphor-react"
+import { useState } from "react";
 import moment from "moment";
 
 interface PostProps {
@@ -27,12 +25,12 @@ interface PostProps {
 }
 
 const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [tipField, setTipField] = useState("");
   const color = useColorModeValue('yellow.600', 'yellow.400')
   const [rgb] = useToken('colors', [color])
 
   const handleSubmit = () => {
-    const n = Number(inputRef.current?.value);
+    const n = Number(tipField);
     if (!isNaN(n) && n > 0) {
       setTipAmount(n);
     }
@@ -67,11 +65,11 @@ const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostPro
             {tipAmount === undefined ?
               <Input
                 placeholder='How much would you like to tip?'
-                ref={inputRef}
+                onChange={(e) => setTipField(e.target.value)}
               />
               :
               <Input
-                placeholder={`You've tipped ${tipAmount} bruinbux`}
+                value={`You've tipped ${tipAmount} bruinbux`}
                 disabled
               />
             }
