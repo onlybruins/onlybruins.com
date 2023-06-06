@@ -2,15 +2,14 @@ import { useForm } from 'react-hook-form'
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
   VStack,
-  Text,
-  FormHelperText
+  FormHelperText,
+  Card
 } from "@chakra-ui/react";
 import useAppStore from './appStore'
 
@@ -47,57 +46,59 @@ export default function Login() {
   }
 
   return (
-    <Flex align="center" justify="center">
-      <Box p={6} rounded="md">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack spacing={4} align="flex-start">
-            <FormControl>
-              <FormLabel htmlFor="username">Username</FormLabel>
-              <Input
-                id='username'
-                placeholder='username'
-                {...register('username', {
-                  required: 'This is required',
-                  minLength: { value: 1, message: 'Should not be empty' },
-                })}
-              />
-              <FormErrorMessage>
-                {errors.username && <p role="alert">{errors.username?.message?.toString()}</p>}
-              </FormErrorMessage>
-            </FormControl>
-            <FormControl isInvalid={!!errors.password && touchedFields.password}>
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <Input
-                id='password'
-                placeholder='password'
-                type='password'
-                {...register('password', {
-                  required: 'This is required',
-                  minLength: { value: 4, message: 'Minimum length should be 4' },
-                })}
-              />
-              <FormErrorMessage>{errors.password && <p role="alert">{errors.password?.message?.toString()}</p>}</FormErrorMessage>
-            </FormControl>
-            <FormControl>
-              <Button type="submit" colorScheme="blue" width="full" disabled={isSubmitting}>
-                Login
-              </Button>
-            </FormControl>
-            <FormControl>
-              <FormHelperText>
-                {"Don't have an account? "}
-                <Button
-                size="sm"
-                variant="link"
-                onClick={() => setAuthUI('register')}
-                >
-                  Register
+    <Card>
+      <Flex align="center" justify="center">
+        <Box p={6} rounded="md">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <VStack spacing={4} align="flex-start">
+              <FormControl>
+                <FormLabel htmlFor="username">Username</FormLabel>
+                <Input
+                  id='username'
+                  placeholder='username'
+                  {...register('username', {
+                    required: 'This is required',
+                    minLength: { value: 1, message: 'Should not be empty' },
+                  })}
+                />
+                <FormErrorMessage>
+                  {errors.username && <p role="alert">{errors.username?.message?.toString()}</p>}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl isInvalid={!!errors.password && touchedFields.password}>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <Input
+                  id='password'
+                  placeholder='password'
+                  type='password'
+                  {...register('password', {
+                    required: 'This is required',
+                    minLength: { value: 4, message: 'Minimum length should be 4' },
+                  })}
+                />
+                <FormErrorMessage>{errors.password && <p role="alert">{errors.password?.message?.toString()}</p>}</FormErrorMessage>
+              </FormControl>
+              <FormControl>
+                <Button type="submit" colorScheme="blue" width="full" disabled={isSubmitting}>
+                  Login
                 </Button>
-              </FormHelperText>
-            </FormControl>
-          </VStack>
-        </form>
-      </Box>
-    </Flex>
+              </FormControl>
+              <FormControl>
+                <FormHelperText>
+                  {"Don't have an account? "}
+                  <Button
+                    size="sm"
+                    variant="link"
+                    onClick={() => setAuthUI('register')}
+                  >
+                    Register
+                  </Button>
+                </FormHelperText>
+              </FormControl>
+            </VStack>
+          </form>
+        </Box>
+      </Flex>
+    </Card>
   );
 }
