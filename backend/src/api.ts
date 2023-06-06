@@ -1,7 +1,7 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount, registerUser } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -179,6 +179,14 @@ api.post('/login', async (req, res) => {
   console.log(`unhashed: "${password}"`)
   console.log(`  hashed: "${hashedPassword}"`)
   const dbres = await validateCredentials(username, hashedPassword);
+  if (dbres) res.status(200).send();
+  else res.status(401).send();
+});
+
+api.post('/register', async (req, res) => {
+  const { username, email, name, password } = req.body;
+  const hashedPassword = SHA256(password).toString();
+  const dbres = await registerUser(username, hashedPassword, name, email, 200);
   if (dbres) res.status(200).send();
   else res.status(401).send();
 });

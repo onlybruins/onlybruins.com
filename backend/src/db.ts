@@ -155,6 +155,21 @@ export const validateCredentials = async (username: string, hashedPassword: stri
   return true
 }
 
+export const registerUser = async (username: string, hashedPassword: string, name: string, email: string, balance: number) => {
+  console.log(`name is ${name}`);
+  if (name === '') name = null;
+  console.log(`name is now ${name}`);
+  try {
+    await pool.query(
+      `INSERT INTO users (username, email, name, password_hash, balance, streak_cnt) VALUES (
+      $1, $2, $3, $4, $5, 0
+    ) RETURNING *`, [username, email, name, hashedPassword, balance]);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 export type TipPostResult = Promise<'ok' | 'already tipped' | 'bad username' | 'bad amount' | 'no such post' | 'cannot tip yourself' | 'insufficient funds'>;
 export type TipPostParams = { author_username: string, post_id: number, tipper_username: string, amount: number };
 export const tipPost = async (params: TipPostParams): TipPostResult => {
