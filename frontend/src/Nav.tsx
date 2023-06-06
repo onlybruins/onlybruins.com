@@ -20,13 +20,15 @@ import {
 import { ReactNode } from "react";
 import useAppStore from "./appStore";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
+import Sticky from 'react-stickynode'
 
 export default function Nav() {
+  const username = useAppStore((state) => state.username);
   const signOut = useAppStore((state) => state.signOut)
 
   // const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <>
+    <Sticky innerZ={999}>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <Box>
@@ -45,44 +47,46 @@ export default function Nav() {
                 hi
               </NavLink>
               <ColorModeSwitcher />
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded={'full'}
-                  variant={'link'}
-                  cursor={'pointer'}
-                  minW={0}>
-                  <Avatar
-                    size={'sm'}
-                    src={'https://avatars.dicebear.com/api/male/username.svg'}
-                  />
-                </MenuButton>
-                <MenuList alignItems={'center'}>
-                  <br />
-                  <Center>
+              {username !== undefined &&
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rounded={'full'}
+                    variant={'link'}
+                    cursor={'pointer'}
+                    minW={0}>
                     <Avatar
-                      size={'2xl'}
+                      size={'sm'}
                       src={'https://avatars.dicebear.com/api/male/username.svg'}
                     />
-                  </Center>
-                  <br />
-                  <Center>
-                    <p>Username</p>
-                  </Center>
-                  <br />
-                  <MenuDivider />
-                  <MenuItem>Your Servers</MenuItem>
-                  <MenuItem>Account Settings</MenuItem>
-                  <MenuItem onClick={signOut}>
-                    Logout
-                  </MenuItem>
-                </MenuList>
-              </Menu>
+                  </MenuButton>
+                  <MenuList alignItems={'center'}>
+                    <br />
+                    <Center>
+                      <Avatar
+                        size={'2xl'}
+                        src={'https://avatars.dicebear.com/api/male/username.svg'}
+                      />
+                    </Center>
+                    <br />
+                    <Center>
+                      <p>{username}</p>
+                    </Center>
+                    <br />
+                    <MenuDivider />
+                    <MenuItem>Your Servers</MenuItem>
+                    <MenuItem>Account Settings</MenuItem>
+                    <MenuItem onClick={signOut}>
+                      Logout
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              }
             </Stack>
           </Flex>
         </Flex>
       </Box>
-    </>
+    </Sticky>
   );
 }
 
