@@ -10,8 +10,9 @@ import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
 import Post from "./Post";
-import Reg from "./Login";
 import useAppStore from './appStore'
+import Register from "./Register";
+import Login from "./Login";
 
 interface BackendPost {
   post_endpoint: string,
@@ -88,6 +89,7 @@ const Feed = () => {
 
 export const App = () => {
   const username = useAppStore((state) => state.username);
+  const authUI = useAppStore((state) => state.authUI);
 
   return (
     <ChakraProvider theme={theme}>
@@ -97,7 +99,10 @@ export const App = () => {
         <Center>
           <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
             {username === undefined ?
-              <Reg />
+              (authUI === 'register' ?
+                <Register />
+                : <Login />
+              )
               :
               <>
                 <NewPost />

@@ -18,10 +18,13 @@ import {
   Image
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
+import useAppStore from "./appStore";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 
 export default function Nav() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const signOut = useAppStore((state) => state.signOut)
+
+  // const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -70,7 +73,9 @@ export default function Nav() {
                   <MenuDivider />
                   <MenuItem>Your Servers</MenuItem>
                   <MenuItem>Account Settings</MenuItem>
-                  <MenuItem>Logout</MenuItem>
+                  <MenuItem onClick={signOut}>
+                    Logout
+                  </MenuItem>
                 </MenuList>
               </Menu>
             </Stack>

@@ -2,23 +2,24 @@ import { useForm } from 'react-hook-form'
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
   VStack,
-  Text,
   FormHelperText
 } from "@chakra-ui/react";
 import useAppStore from './appStore'
 
-export default function Login() {
+export default function Register() {
+  const setAuthUI = useAppStore((state) => state.setAuthUI);
 
   type FormValues = {
     username: string;
+    email: string;
     password: string;
+    name: string;
   }
 
   const {
@@ -29,7 +30,6 @@ export default function Login() {
   } = useForm<FormValues>()
 
   const signIn = useAppStore((state) => state.signIn);
-  const setAuthUI = useAppStore((state) => state.setAuthUI);
 
   const onSubmit = async (values: FormValues) => {
     const resp = await fetch('/api/login', {
@@ -55,7 +55,7 @@ export default function Login() {
               <FormLabel htmlFor="username">Username</FormLabel>
               <Input
                 id='username'
-                placeholder='username'
+                placeholder='bobbymcbobberface'
                 {...register('username', {
                   required: 'This is required',
                   minLength: { value: 1, message: 'Should not be empty' },
@@ -64,6 +64,22 @@ export default function Login() {
               <FormErrorMessage>
                 {errors.username && <p role="alert">{errors.username?.message?.toString()}</p>}
               </FormErrorMessage>
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="name">Full Name</FormLabel>
+              <Input
+                id='name'
+                placeholder='Bob the Builder'
+                {...register('name')}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <Input
+                id='email'
+                placeholder='bobby@gmail.com'
+                {...register('email')}
+              />
             </FormControl>
             <FormControl isInvalid={!!errors.password && touchedFields.password}>
               <FormLabel htmlFor="password">Password</FormLabel>
@@ -78,20 +94,18 @@ export default function Login() {
               />
               <FormErrorMessage>{errors.password && <p role="alert">{errors.password?.message?.toString()}</p>}</FormErrorMessage>
             </FormControl>
-            <FormControl>
-              <Button type="submit" colorScheme="blue" width="full" disabled={isSubmitting}>
-                Login
-              </Button>
-            </FormControl>
+            <Button type="submit" colorScheme="blue" width="full" disabled={isSubmitting}>
+              Register
+            </Button>
             <FormControl>
               <FormHelperText>
-                {"Don't have an account? "}
+                {"Already have an account? "}
                 <Button
-                size="sm"
-                variant="link"
-                onClick={() => setAuthUI('register')}
+                  size="sm"
+                  variant="link"
+                  onClick={() => setAuthUI('login')}
                 >
-                  Register
+                  Login
                 </Button>
               </FormHelperText>
             </FormControl>
