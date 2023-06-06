@@ -1,28 +1,29 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
 
 const api = express.Router();
 
-interface FakePost {
+interface Post {
   post_endpoint: string,
   poster_name: string,
   poster_username: string,
   image_endpoint: string,
   timestamp: string,
   tippedAmount?: number,
+  tip_endpoint: string,
 }
 
-function createRandomFakePost(): FakePost {
+function createRandomFakePost(): Post {
   const poster_name = faker.name.firstName();
   const poster_username = faker.internet.userName();
   const timestamp = faker.date.between('2015-01-01T00:00:00.000Z', '2023-05-01T00:00:00.000Z');
   const image_endpoint = faker.image.fashion(1280, 720, true);
-  const tippedAmount = faker.helpers.arrayElement([null, faker.datatype.number(100)])
+  const tippedAmount = faker.helpers.arrayElement([undefined, faker.datatype.number(100)]);
 
   return {
     post_endpoint: null,
@@ -31,6 +32,7 @@ function createRandomFakePost(): FakePost {
     image_endpoint,
     timestamp: timestamp.toISOString(),
     tippedAmount,
+    tip_endpoint: 'fake-post-cannot-tip',
   };
 }
 
@@ -82,12 +84,13 @@ api.get('/users/:username/posts', async (req, res) => {
   if (dbres === undefined)
     res.status(404).send();
   else
-    res.json(dbres.map(post => ({
+    res.json(dbres.map((post): Post => ({
       post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}`),
       poster_name: post.name,
       poster_username: post.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
-      timestamp: post.timestamp
+      timestamp: post.timestamp,
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tips`),
     })));
 });
 
@@ -101,8 +104,45 @@ api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
       poster_name: post.name,
       poster_username: req.params.username,
       image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
-      timestamp: post.timestamp
+      timestamp: post.timestamp,
+      tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tips`),
     });
+});
+
+api.post('/users/:username/posts/:postid(\\d+)/tips', express.json(), async (req, res) => {
+  if (!req.body.tipper_username
+    || !req.body.amount
+    || typeof req.body.amount !== "number"
+    || req.body.amount <= 0) {
+    res.status(400).send();
+    return;
+  }
+  const dbres = await tipPost({
+    author_username: req.params.username,
+    tipper_username: req.body.tipper_username,
+    post_id: Number(req.params.postid),
+    amount: req.body.amount,
+  });
+  if (dbres === "ok") {
+    const tipped_post_endpoint = `${req.baseUrl}/users/${req.params.username}/posts/${req.params.postid}`;
+    console.log(`User ${req.body.tipper_username} tipped ${req.body.amount} to ${tipped_post_endpoint}`);
+    res.status(200).send();
+  }
+  else {
+    res.status(400).json(dbres);
+  }
+});
+
+api.get('/users/:username/posts/:postid(\\d+)/tips/:tipper_username', async (req, res) => {
+  const dbres = await getTipAmount({
+    author_username: req.params.username,
+    tipper_username: req.params.tipper_username,
+    post_id: Number(req.params.postid),
+  });
+  if (dbres === undefined)
+    res.status(404).send();
+  else
+    res.json(dbres);
 });
 
 const ugcUpload = multer({
