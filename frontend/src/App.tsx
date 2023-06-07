@@ -29,26 +29,26 @@ const Feed = () => {
   const [posts, setPosts] = useState<BackendPost[]>([]);
   const [postTips, setPostTips] = useState<{ [tipEndpoint: string]: (number | undefined) }>({});
 
-  const fetchData = () => {
-    const endpoint = '/api/users/T%20Omegalul%20M/posts';
-    const newPostsP = fetch(endpoint).then(res => res.json() as Promise<BackendPost[]>);
-    newPostsP.then(newPosts => {
-      setPosts(posts.concat(newPosts));
-      // get the amounts the logged-in user has tipped to each new post
-      Promise.all(
-        newPosts.map(p =>
-          fetch(`${p.tip_endpoint}/${username}`)
-            .then(res => res.status === 200 ? res.json().then(json => json.amount) : Promise.resolve(null))
-        )
-      ).then(resps => {
-        let nextPostTips = { ...postTips };
-        resps.forEach((tipValue, i) => {
-          if (tipValue !== null) {
-            nextPostTips[newPosts[i].tip_endpoint] = tipValue;
-          }
-        });
-        setPostTips(nextPostTips);
+  const fetchData = async () => {
+    const endpoint = `/api/users/${username}/feed`;
+    const newPosts = await fetch(endpoint).then(res => res.json() as Promise<BackendPost[]>);
+    console.log(endpoint)
+    console.log(JSON.stringify(newPosts))
+    setPosts(posts.concat(newPosts));
+    // get the amounts the logged-in user has tipped to each new post
+    Promise.all(
+      newPosts.map(p =>
+        fetch(`${p.tip_endpoint}/${username}`)
+          .then(res => res.status === 200 ? res.json().then(json => json.amount) : Promise.resolve(null))
+      )
+    ).then(resps => {
+      let nextPostTips = { ...postTips };
+      resps.forEach((tipValue, i) => {
+        if (tipValue !== null) {
+          nextPostTips[newPosts[i].tip_endpoint] = tipValue;
+        }
       });
+      setPostTips(nextPostTips);
     });
   }
 
@@ -92,10 +92,10 @@ export const App = () => {
   const username = useAppStore((state) => state.username);
   const authUI = useAppStore((state) => state.authUI);
 
- /* return (
-    <Profile />
-  ) */
- return (
+  /* return (
+     <Profile />
+   ) */
+  return (
     <ChakraProvider theme={theme}>
       <Nav />
       <br />
@@ -103,10 +103,7 @@ export const App = () => {
         <Center>
           <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
             {username === undefined ?
-              (authUI === 'register' ?
-                <Register />
-                : <Login />
-              )
+              (authUI === 'register' ? <Register /> : <Login />)
               :
               <>
                 <NewPost />

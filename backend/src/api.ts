@@ -1,7 +1,7 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount, registerUser } from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount, registerUser, getFeed } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -93,6 +93,18 @@ api.get('/users/:username/posts', async (req, res) => {
       tip_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}/tips`),
     })));
 });
+
+api.get('/users/:username/feed', async (req, res) => {
+  const posts = await getFeed(req.params.username);
+  res.json(posts.map((post): Post => ({
+    post_endpoint: encodeURI(`${req.baseUrl}/users/${req.params.username}/posts/${post.post_id}`),
+    poster_name: post.name,
+    poster_username: post.username,
+    image_endpoint: encodeURI(`/images/${post.image_id}.${post.image_extension}`),
+    timestamp: post.timestamp,
+    tip_endpoint: encodeURI(`${req.baseUrl}/users/${post.username}/posts/${post.post_id}/tips`),
+  })))
+})
 
 api.get('/users/:username/posts/:postid(\\d+)', async (req, res) => {
   const post = await getPost(req.params.username, parseInt(req.params.postid));

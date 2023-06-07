@@ -135,6 +135,19 @@ export const getPost = async (username: string, post_id: number) => {
   }
 }
 
+export const getFeed = async (username: string) => {
+  const res = await pool.query(
+    `SELECT users.name, users.username, posts.post_id, posts.poster_id, posts.image_id, posts.image_extension, posts.timestamp
+    FROM posts
+    JOIN users
+    ON users.id = poster_id
+    WHERE poster_id IN
+    (SELECT creator_id FROM subscriptions
+      WHERE follower_id = (SELECT id FROM users WHERE username = $1))`, [username]
+  )
+  return res.rows
+}
+
 export const makePost = async (username: string, image_id: string, image_extension: string) => {
   const res = await pool.query(
     `INSERT INTO posts(poster_id, image_id, image_extension)
@@ -159,9 +172,8 @@ export const registerUser = async (username: string, hashedPassword: string, nam
   console.log(`name is ${name}`);
   if (name === '') name = null;
   if (username === '' || email === '') return false;
-  console.log(`name is now ${name}`);
   try {
-    const res = await pool.query(
+    await pool.query(
       `INSERT INTO users (username, email, name, password_hash, balance, streak_cnt) VALUES (
       $1, $2, $3, $4, $5, 0
     )`, [username, email, name, hashedPassword, balance]);
