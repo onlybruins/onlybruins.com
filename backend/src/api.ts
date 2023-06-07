@@ -125,7 +125,9 @@ api.post('/users/:username/posts/:postid(\\d+)/tips', express.json(), async (req
   if (!req.body.tipper_username
     || !req.body.amount
     || typeof req.body.amount !== "number"
-    || req.body.amount <= 0) {
+    || req.body.amount <= 0
+    || req.body.amount > 200000 // keep amount under 1/10000th of Postgres's max int value
+    || !Number.isInteger(req.body.amount)) {
     res.status(400).send();
     return;
   }

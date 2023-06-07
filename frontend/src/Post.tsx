@@ -31,7 +31,10 @@ const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostPro
 
   const handleSubmit = () => {
     const n = Number(tipField);
-    if (!isNaN(n) && n > 0) {
+    if (!isNaN(n)
+      && n > 0
+      && n <= 200000 // keep amount under 1/10000th of Postgres's max int value
+      && Number.isInteger(n)) {
       setTipAmount(n);
     }
   }
