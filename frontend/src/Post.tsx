@@ -39,7 +39,7 @@ const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostPro
   const dateString = moment(postDate).fromNow();
 
   return (
-    <Card>
+    <Card width='full'>
       <CardHeader paddingBottom="0px">
         <Flex>
           <Heading textAlign='left' size='sm'>{username}</Heading>

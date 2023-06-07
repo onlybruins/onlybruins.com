@@ -78,7 +78,7 @@ export default function Register() {
                   {...register('name')}
                 />
               </FormControl>
-              <FormControl isInvalid={!!errors.email && touchedFields.email}>
+              <FormControl isInvalid={!!errors.email}>
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <Input
                   id='email'
@@ -93,7 +93,7 @@ export default function Register() {
                 />
                 <FormErrorMessage>{errors.email && <p role="alert">{errors.email?.message?.toString()}</p>}</FormErrorMessage>
               </FormControl>
-              <FormControl isInvalid={!!errors.password && touchedFields.password}>
+              <FormControl isInvalid={!!errors.password}>
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <Input
                   id='password'
