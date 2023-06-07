@@ -9,7 +9,8 @@ import {
   Input,
   VStack,
   FormHelperText,
-  Card
+  Card,
+  useToast
 } from "@chakra-ui/react";
 import useAppStore from './appStore'
 
@@ -26,11 +27,11 @@ export default function Register() {
   const {
     handleSubmit,
     register,
-    setError,
     formState: { errors, isSubmitting, touchedFields },
   } = useForm<FormValues>()
 
   const signIn = useAppStore((state) => state.signIn);
+  const toast = useToast();
 
   const onSubmit = async (values: FormValues) => {
     console.log('submitting')
@@ -45,7 +46,7 @@ export default function Register() {
     if (resp.status === 200) {
       signIn(values.username);
     } else {
-      setError('username', { type: 'custom', message: 'User already exists' });
+      toast({ status: 'error', position: 'bottom', title: 'User already exists' });
     }
   }
 
@@ -77,13 +78,20 @@ export default function Register() {
                   {...register('name')}
                 />
               </FormControl>
-              <FormControl>
+              <FormControl isInvalid={!!errors.email && touchedFields.email}>
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <Input
                   id='email'
                   placeholder='bobby@gmail.com'
-                  {...register('email')}
+                  {...register('email', {
+                    required: 'This is required',
+                    pattern: {
+                      value: /\S+@\S+\.\S+/,
+                      message: "Invalid email",
+                    },
+                  })}
                 />
+                <FormErrorMessage>{errors.email && <p role="alert">{errors.email?.message?.toString()}</p>}</FormErrorMessage>
               </FormControl>
               <FormControl isInvalid={!!errors.password && touchedFields.password}>
                 <FormLabel htmlFor="password">Password</FormLabel>

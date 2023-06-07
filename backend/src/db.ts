@@ -158,12 +158,13 @@ export const validateCredentials = async (username: string, hashedPassword: stri
 export const registerUser = async (username: string, hashedPassword: string, name: string, email: string, balance: number) => {
   console.log(`name is ${name}`);
   if (name === '') name = null;
+  if (username === '' || email === '') return false;
   console.log(`name is now ${name}`);
   try {
-    await pool.query(
+    const res = await pool.query(
       `INSERT INTO users (username, email, name, password_hash, balance, streak_cnt) VALUES (
       $1, $2, $3, $4, $5, 0
-    ) RETURNING *`, [username, email, name, hashedPassword, balance]);
+    )`, [username, email, name, hashedPassword, balance]);
     return true;
   } catch (e) {
     return false;

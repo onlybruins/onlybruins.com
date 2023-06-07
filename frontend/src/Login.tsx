@@ -9,7 +9,8 @@ import {
   Input,
   VStack,
   FormHelperText,
-  Card
+  Card,
+  useToast
 } from "@chakra-ui/react";
 import useAppStore from './appStore'
 
@@ -23,12 +24,12 @@ export default function Login() {
   const {
     handleSubmit,
     register,
-    setError,
     formState: { errors, isSubmitting, touchedFields },
   } = useForm<FormValues>()
 
   const signIn = useAppStore((state) => state.signIn);
   const setAuthUI = useAppStore((state) => state.setAuthUI);
+  const toast = useToast();
 
   const onSubmit = async (values: FormValues) => {
     const resp = await fetch('/api/login', {
@@ -41,7 +42,7 @@ export default function Login() {
     if (resp.status === 200) {
       signIn(values.username);
     } else {
-      setError('password', { type: 'custom', message: 'Could not find associated user' });
+      toast({status: 'error', position: 'bottom', title: 'Could not find associated user' });
     }
   }
 

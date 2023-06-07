@@ -22,7 +22,7 @@ SET search_path TO onlybruins,public;
 CREATE TABLE users (
   id            serial primary key UNIQUE,
   username      varchar(80) UNIQUE NOT NULL,
-  email         varchar(80) UNIQUE,
+  email         varchar(80) UNIQUE NOT NULL,
   name          varchar(80),
   password_hash varchar(80),
   balance       int,

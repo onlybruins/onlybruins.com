@@ -25,6 +25,7 @@ import Sticky from 'react-stickynode'
 export default function Nav() {
   const username = useAppStore((state) => state.username);
   const signOut = useAppStore((state) => state.signOut)
+  const setAuthUI = useAppStore((state) => state.setAuthUI);
 
   // const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -76,7 +77,10 @@ export default function Nav() {
                     <MenuDivider />
                     <MenuItem>Your Servers</MenuItem>
                     <MenuItem>Account Settings</MenuItem>
-                    <MenuItem onClick={signOut}>
+                    <MenuItem onClick={() => {
+                      signOut()
+                      setAuthUI('login')
+                    }}>
                       Logout
                     </MenuItem>
                   </MenuList>
