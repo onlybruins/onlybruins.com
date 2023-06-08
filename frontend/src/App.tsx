@@ -16,6 +16,7 @@ import Register from "./Register";
 import Login from "./Login";
 import { CurrencyCircleDollar } from "phosphor-react";
 import Profile from "./ProfilePage"
+import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 
 interface BackendPost {
   post_endpoint: string,
@@ -30,12 +31,12 @@ const Feed = () => {
   const username = useAppStore((state) => state.username);
   const [posts, setPosts] = useState<BackendPost[]>([]);
   const [postTips, setPostTips] = useState<{ [tipEndpoint: string]: (number | undefined) }>({});
+  const toast = useToast();
+  const queryClient = useQueryClient();
 
   const fetchData = async () => {
     const endpoint = `/api/users/${username}/feed`;
     const newPosts = await fetch(endpoint).then(res => res.json() as Promise<BackendPost[]>);
-    console.log(endpoint)
-    console.log(JSON.stringify(newPosts))
     setPosts(posts.concat(newPosts));
     // get the amounts the logged-in user has tipped to each new post
     Promise.all(
@@ -63,9 +64,10 @@ const Feed = () => {
       .then(res => {
         if (res.status === 200) {
           setPostTips({ ...postTips, [tip_endpoint]: amount });
+          queryClient.invalidateQueries(['balance']);
         }
         else {
-          res.json().then(json => alert(`Failed to tip: ${json}`));
+          res.json().then(json => toast({ status: 'error', 'position': 'bottom-right', title: `Failed to tip: ${json}` }));
         }
       });
   }
@@ -113,6 +115,8 @@ const pollNotifications = async (username: string, toast: CallableFunction) => {
       }));
 }
 
+const queryClient = new QueryClient()
+
 export const App = () => {
   const username = useAppStore((state) => state.username);
   const authUI = useAppStore((state) => state.authUI);
@@ -130,27 +134,28 @@ export const App = () => {
     return () => { clearInterval(timeoutId); };
   }, [username, toast]);
 
-  /* return (
-     <Profile />
-   ) */
   return (
-    <ChakraProvider theme={theme}>
-      <Nav />
-      <br />
-      <Box fontSize="xl">
-        <Center>
-          <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
-            {username === undefined ?
-              (authUI === 'register' ? <Register /> : <Login />)
-              :
-              <>
-                <NewPost />
-                <Feed />
-              </>
-            }
-          </VStack>
-        </Center>
-      </Box>
-    </ChakraProvider>
+    <QueryClientProvider client={queryClient}>
+      <ChakraProvider theme={theme}>
+        {/* <Todos /> */}
+        {/* <Search /> */}
+        <Nav />
+        <br />
+        <Box fontSize="xl">
+          <Center>
+            <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
+              {username === undefined ?
+                (authUI === 'register' ? <Register /> : <Login />)
+                :
+                <>
+                  <NewPost />
+                  <Feed />
+                </>
+              }
+            </VStack>
+          </Center>
+        </Box>
+      </ChakraProvider>
+    </QueryClientProvider>
   )
 }
