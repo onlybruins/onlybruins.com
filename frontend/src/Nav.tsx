@@ -12,22 +12,22 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Stack,
   useColorModeValue,
-  useDisclosure,
-  Image
+  Image,
+  HStack,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import useAppStore from "./appStore";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Sticky from 'react-stickynode'
+import { Balance } from "./Balance";
+import { Search } from "./Search";
 
 export default function Nav() {
   const username = useAppStore((state) => state.username);
   const signOut = useAppStore((state) => state.signOut)
   const setAuthUI = useAppStore((state) => state.setAuthUI);
 
-  // const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Sticky innerZ={999}>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -41,53 +41,48 @@ export default function Nav() {
             />
           </Box>
 
-
-          <Flex alignItems={'center'}>
-            <Stack direction={'row'} spacing={7}>
-              <NavLink>
-                hi
-              </NavLink>
-              <ColorModeSwitcher />
-              {username !== undefined &&
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    rounded={'full'}
-                    variant={'link'}
-                    cursor={'pointer'}
-                    minW={0}>
+          <HStack spacing={3}>
+            {username !== undefined && <Balance />}
+            {username !== undefined && <Search />}
+            <ColorModeSwitcher />
+            {username !== undefined &&
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  variant={'outline'}
+                  cursor={'pointer'}
+                  minW={0}>
+                  <Avatar
+                    size={'sm'}
+                    src={'https://avatars.dicebear.com/api/male/username.svg'}
+                  />
+                </MenuButton>
+                <MenuList alignItems={'center'}>
+                  <br />
+                  <Center>
                     <Avatar
-                      size={'sm'}
+                      size={'2xl'}
                       src={'https://avatars.dicebear.com/api/male/username.svg'}
                     />
-                  </MenuButton>
-                  <MenuList alignItems={'center'}>
-                    <br />
-                    <Center>
-                      <Avatar
-                        size={'2xl'}
-                        src={'https://avatars.dicebear.com/api/male/username.svg'}
-                      />
-                    </Center>
-                    <br />
-                    <Center>
-                      <p>{username}</p>
-                    </Center>
-                    <br />
-                    <MenuDivider />
-                    <MenuItem>Your Servers</MenuItem>
-                    <MenuItem>Account Settings</MenuItem>
-                    <MenuItem onClick={() => {
-                      signOut()
-                      setAuthUI('login')
-                    }}>
-                      Logout
-                    </MenuItem>
-                  </MenuList>
-                </Menu>
-              }
-            </Stack>
-          </Flex>
+                  </Center>
+                  <br />
+                  <Center>
+                    <p>{username}</p>
+                  </Center>
+                  <br />
+                  <MenuDivider />
+                  <MenuItem>Your Servers</MenuItem>
+                  <MenuItem>Account Settings</MenuItem>
+                  <MenuItem onClick={() => {
+                    signOut()
+                    setAuthUI('login')
+                  }}>
+                    Logout
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            }
+          </HStack>
         </Flex>
       </Box>
     </Sticky>
