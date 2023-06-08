@@ -56,14 +56,15 @@ export const getFollowing = async (username: string) => {
     .then(res => res.rows.map(r => r.username));
 }
 
-export const addFollower = async (params: { creator_username: string, follower_username: string }) => {
+type AddFollowerResult = Promise<'ok' | 'already following' | 'bad username'>;
+export const addFollower = async (params: { creator_username: string, follower_username: string }): AddFollowerResult => {
   const res = await pool.query(
     `INSERT INTO subscriptions(follower_id, creator_id)
     VALUES((SELECT id FROM users WHERE username = $1), (SELECT id FROM users WHERE username = $2))
-    ON CONFLICT DO NOTHING`, [params.follower_username, params.creator_username]);
+    ON CONFLICT DO NOTHING
+    RETURNING *`, [params.follower_username, params.creator_username]);
   if (res.rows.length > 0) {
-    // successfully followed
-    return true;
+    return 'ok';
   }
   else {
     const res2 = await pool.query(
@@ -71,8 +72,7 @@ export const addFollower = async (params: { creator_username: string, follower_u
       FROM users
       WHERE username = $1 OR username = $2`,
       [params.follower_username, params.creator_username]);
-    // OK if the users exist (attempted to follow again), not OK otherwise
-    return res2.rows.length == 2;
+    return res2.rows.length == 2 ? 'already following' : 'bad username';
   }
 }
 
@@ -289,4 +289,51 @@ export const getTipAmount = async (params: { author_username: string, tipper_use
     return undefined;
   }
   return res.rows[0];
+}
+
+export type Notification = {
+  timestamp: string,
+  message: string,
+}
+
+export const pollNotificationsOf = async (username: string): Promise<Notification[] | undefined> => {
+  const userExists = await pool.query(
+    `SELECT 1 FROM users WHERE username = $1`
+    , [username])
+    .then(res => res.rows.length > 0);
+  if (!userExists) {
+    return undefined;
+  }
+  const res = await pool.query(
+    `WITH user_ AS (
+      SELECT id, last_checked_notifications
+      FROM users
+      WHERE username = $1
+    )
+    SELECT timestamp, message, kind
+    FROM notifications, user_
+    WHERE notified_user_id = user_.id
+          AND (user_.last_checked_notifications IS NULL
+               OR user_.last_checked_notifications < timestamp)`
+    , [username]);
+  // TODO: fix race condition that could cause a notification made at this point to be missed
+  await pool.query(
+    `UPDATE users
+    SET last_checked_notifications = now() at time zone 'utc'
+    WHERE username = $1`
+    , [username]);
+  return res.rows;
+}
+
+export const addNotification = async (username: string, kind: 'money' | 'info', message: string) => {
+  const res = await pool.query(
+    `INSERT INTO notifications(notified_user_id, message, kind)
+    VALUES((SELECT id FROM users WHERE username = $1), $2, $3)
+    ON CONFLICT DO NOTHING
+    RETURNING *`
+    , [username, message, kind]);
+    if (res.rows.length === 1) {
+      return true;
+    }
+    return false;
 }

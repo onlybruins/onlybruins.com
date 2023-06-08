@@ -4,8 +4,9 @@ import {
   VStack,
   theme,
   Center,
+  useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import Nav from "./Nav";
 import NewPost from "./NewPost";
@@ -13,6 +14,7 @@ import Post from "./Post";
 import useAppStore from './appStore'
 import Register from "./Register";
 import Login from "./Login";
+import { CurrencyCircleDollar } from "phosphor-react";
 import Profile from "./ProfilePage"
 
 interface BackendPost {
@@ -88,9 +90,45 @@ const Feed = () => {
   )
 }
 
+type Notification = {
+  timestamp: string,
+  message: string,
+  kind: 'money' | 'info',
+}
+
+const pollNotifications = async (username: string, toast: CallableFunction) => {
+  fetch(encodeURI(`/api/users/${username}/poll-notifications`), {
+    method: 'POST'
+  })
+    .then(res => res.json())
+    .then((notifs: Notification[]) =>
+      notifs.forEach(f => {
+        toast({
+          // hack: use warning to get yellow coin-like color
+          status: f.kind === 'money' ? 'warning' : 'info',
+          icon: f.kind === 'money' ? <CurrencyCircleDollar size="24px" /> : undefined,
+          position: 'bottom-right',
+          title: f.message,
+        });
+      }));
+}
+
 export const App = () => {
   const username = useAppStore((state) => state.username);
   const authUI = useAppStore((state) => state.authUI);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (username === undefined) {
+      return;
+    }
+    const timeoutId = setInterval(() => {
+      if (username !== undefined) {
+        pollNotifications(username, toast);
+      }
+    }, 500);
+    return () => { clearInterval(timeoutId); };
+  }, [username, toast]);
 
   /* return (
      <Profile />

@@ -1,7 +1,23 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount, registerUser, getFeed } from './db';
+import {
+  getAssociatedName,
+  getFollowers,
+  getFollowing,
+  addFollower,
+  removeFollower,
+  validateCredentials,
+  getPosts,
+  getPost,
+  makePost,
+  tipPost,
+  getTipAmount,
+  registerUser,
+  pollNotificationsOf,
+  getFeed,
+  addNotification,
+} from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -70,7 +86,13 @@ api.get('/users/:username/following', async (req, res) => {
 api.put('/users/:username/following/:creator_username', async (req, res) => {
   const dbres = await addFollower({ creator_username: req.params.creator_username, follower_username: req.params.username });
   console.log(`${req.params.username} following ${req.params.creator_username}: ${dbres}`);
-  res.status(dbres ? 200 : 400).send();
+  if (dbres === 'ok') {
+    await addNotification(req.params.creator_username, 'info', `New follower: @${req.params.username}`);
+    res.status(200).send();
+  }
+  else {
+    res.status(400).json(dbres);
+  }
 });
 
 api.delete('/users/:username/following/:creator_username', async (req, res) => {
@@ -140,6 +162,7 @@ api.post('/users/:username/posts/:postid(\\d+)/tips', express.json(), async (req
   if (dbres === "ok") {
     const tipped_post_endpoint = `${req.baseUrl}/users/${req.params.username}/posts/${req.params.postid}`;
     console.log(`User ${req.body.tipper_username} tipped ${req.body.amount} to ${tipped_post_endpoint}`);
+    await addNotification(req.params.username, 'money', `Got ${req.body.amount} bruinbux from @${req.body.tipper_username}`);
     res.status(200).send();
   }
   else {
@@ -203,6 +226,12 @@ api.post('/register', async (req, res) => {
   const dbres = await registerUser(username, hashedPassword, name, email, 200);
   if (dbres) res.status(200).send();
   else res.status(401).send();
+});
+
+api.post('/users/:username/poll-notifications', async (req, res) => {
+  const dbres = await pollNotificationsOf(req.params.username);
+  if (dbres === undefined) res.status(404).send();
+  else res.json(dbres).send();
 });
 
 export default api;
