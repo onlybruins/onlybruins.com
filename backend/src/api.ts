@@ -211,11 +211,19 @@ api.post('/login', async (req, res) => {
   else res.status(401).send();
 });
 
+const usernameRegex = RegExp(/^[A-Za-z0-9][-_ A-Za-z0-9]*[A-Za-z0-9]$/);
 api.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
+  if (!usernameRegex.test(username)) {
+    res.status(400).json("Invalid username").send();
+    return;
+  }
   const hashedPassword = SHA256(password).toString();
   const dbres = await registerUser(username, hashedPassword, name, email, 200);
-  if (dbres) res.status(200).send();
+  if (dbres) { 
+    console.log(`New user: @${username}`);
+    res.status(200).send();
+  }
   else res.status(401).send();
 });
 

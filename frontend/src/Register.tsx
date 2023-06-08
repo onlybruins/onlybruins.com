@@ -56,14 +56,17 @@ export default function Register() {
         <Box p={6} rounded="md">
           <form onSubmit={handleSubmit(onSubmit)}>
             <VStack spacing={4} align="flex-start">
-              <FormControl>
+              <FormControl isInvalid={!!errors.username}>
                 <FormLabel htmlFor="username">Username</FormLabel>
                 <Input
                   id='username'
                   placeholder='bobbymcbobberface'
                   {...register('username', {
                     required: 'This is required',
-                    minLength: { value: 1, message: 'Should not be empty' },
+                    pattern: {
+                      value: /^[A-Za-z0-9][-_ A-Za-z0-9]*[A-Za-z0-9]$/,
+                      message: "Must match ^[A-Za-z0-9][-_ A-Za-z0-9]*[A-Za-z0-9]$",
+                    }
                   })}
                 />
                 <FormErrorMessage>
@@ -101,7 +104,7 @@ export default function Register() {
                   type='password'
                   {...register('password', {
                     required: 'This is required',
-                    minLength: { value: 4, message: 'Minimum length should be 4' },
+                    minLength: { value: 4, message: 'Minimum length is 4' },
                   })}
                 />
                 <FormErrorMessage>{errors.password && <p role="alert">{errors.password?.message?.toString()}</p>}</FormErrorMessage>

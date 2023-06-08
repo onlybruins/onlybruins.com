@@ -169,7 +169,6 @@ export const validateCredentials = async (username: string, hashedPassword: stri
 }
 
 export const registerUser = async (username: string, hashedPassword: string, name: string, email: string, balance: number) => {
-  console.log(`name is ${name}`);
   if (name === '') name = null;
   if (username === '' || email === '') return false;
   try {
