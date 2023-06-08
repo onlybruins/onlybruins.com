@@ -238,9 +238,7 @@ api.post('/users/:username/poll-notifications', async (req, res) => {
 api.get('/search', async (req, res) => {
   const query = req.query.term as string;
   const user = req.query.user as string;
-  console.log(`query ${query}`)
   const dbres = await searchResults(query, user);
-  console.log(dbres)
   res.json(dbres.map(({ username, is_following }: { username: string; is_following: boolean; }) => ({
     username,
     /* TODO: profile page endpoint */

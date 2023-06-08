@@ -69,14 +69,12 @@ export function Search() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['searchResults', { field }],
     queryFn: async (): Promise<AccountResult[]> => {
-      if (field === '') return [];
       const endpoint = '/api/search?' + new URLSearchParams({
         term: field,
         user: username,
       });
       const res = await fetch(endpoint);
       const data = await res.json();
-      console.log("GOT", data)
       return data as AccountResult[];
     }
   })
