@@ -36,7 +36,7 @@ export const Balance = () => {
     <Box bg={boxColor} borderRadius='md' px={4}>
       <Center h={10}>
         <HStack spacing={3}>
-          <Coins color={iconRgb} size="1.2rem" weight="regular" />
+          <Coins color={iconRgb} size="19px" weight="regular" />
           <Text ref={countUpRef} color={iconColor}>{data.balance?.toLocaleString()}</Text>
         </HStack>
       </Center>
