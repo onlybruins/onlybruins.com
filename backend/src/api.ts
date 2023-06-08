@@ -219,9 +219,11 @@ api.post('/register', async (req, res) => {
     return;
   }
   const hashedPassword = SHA256(password).toString();
-  const dbres = await registerUser(username, hashedPassword, name, email, 200);
+  const initialBalance = 200;
+  const dbres = await registerUser(username, hashedPassword, name, email, initialBalance);
   if (dbres) { 
     console.log(`New user: @${username}`);
+    await addNotification(username, 'money', `Welcome to OnlyBruins! Here's ${initialBalance} bruinbux on us`);
     res.status(200).send();
   }
   else res.status(401).send();
