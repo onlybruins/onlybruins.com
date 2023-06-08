@@ -348,7 +348,7 @@ export const addNotification = async (username: string, kind: 'money' | 'info', 
 }
 
 export const searchResults = async (query: string, user: string) => {
-  const likeParam = `%${query}%`;
+  const likeParam = `%${query.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')}%`;
   const res = await pool.query(
     `WITH searching_user AS (SELECT id FROM users WHERE username = $2)
      SELECT username, EXISTS(SELECT 1 FROM subscriptions, searching_user WHERE creator_id = users.id AND follower_id = searching_user.id)
