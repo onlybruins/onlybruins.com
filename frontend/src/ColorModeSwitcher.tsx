@@ -5,24 +5,25 @@ import {
   IconButton,
   IconButtonProps,
 } from "@chakra-ui/react"
-import { FaMoon, FaSun } from "react-icons/fa"
+import { Moon, Sun } from "phosphor-react"
 
 type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">
 
 export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
   const { toggleColorMode } = useColorMode()
   const text = useColorModeValue("dark", "light")
-  const SwitchIcon = useColorModeValue(FaMoon, FaSun)
+  const color = useColorModeValue("blue", "yellow")
+  const SwitchIcon = useColorModeValue(Moon, Sun)
 
   return (
     <IconButton
       size="md"
       fontSize="lg"
-      variant="ghost"
-      color="current"
+      variant="outline"
+      colorScheme={color}
       marginLeft="2"
       onClick={toggleColorMode}
-      icon={<SwitchIcon />}
+      icon={<SwitchIcon weight="duotone" />}
       aria-label={`Switch to ${text} mode`}
       {...props}
     />

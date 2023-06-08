@@ -1,23 +1,7 @@
 import SHA256 from 'crypto-js/sha256';
 import express from 'express'
 import { faker } from '@faker-js/faker';
-import {
-  getAssociatedName,
-  getFollowers,
-  getFollowing,
-  addFollower,
-  removeFollower,
-  validateCredentials,
-  getPosts,
-  getPost,
-  makePost,
-  tipPost,
-  getTipAmount,
-  registerUser,
-  pollNotificationsOf,
-  getFeed,
-  addNotification,
-} from './db';
+import { getAssociatedName, getFollowers, getFollowing, addFollower, removeFollower, validateCredentials, getPosts, getPost, makePost, tipPost, getTipAmount, registerUser, getFeed, searchResults, getBalance, addNotification, pollNotificationsOf } from './db';
 import multer from 'multer';
 import { UgcStorage, RequestWithUUID, supportedMimeTypeToFileExtension } from './image-handling';
 import { v4 as uuidv4 } from 'uuid';
@@ -116,6 +100,15 @@ api.get('/users/:username/posts', async (req, res) => {
     })));
 });
 
+api.get('/users/:username/balance', async (req, res) => {
+  const balance = await getBalance(req.params.username);
+  if (balance === undefined) {
+    res.status(404).send()
+  } else {
+    res.json(balance)
+  }
+})
+
 api.get('/users/:username/feed', async (req, res) => {
   const posts = await getFeed(req.params.username);
   res.json(posts.map((post): Post => ({
@@ -184,7 +177,7 @@ api.get('/users/:username/posts/:postid(\\d+)/tips/:tipper_username', async (req
 
 const ugcUpload = multer({
   storage: UgcStorage,
-  fileFilter: (req, file, callback) => callback(null, file.mimetype in supportedMimeTypeToFileExtension)
+  fileFilter: (_req, file, callback) => callback(null, file.mimetype in supportedMimeTypeToFileExtension)
 }).single('postImage');
 
 api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
@@ -232,6 +225,20 @@ api.post('/users/:username/poll-notifications', async (req, res) => {
   const dbres = await pollNotificationsOf(req.params.username);
   if (dbres === undefined) res.status(404).send();
   else res.json(dbres).send();
+});
+
+api.get('/search', async (req, res) => {
+  const query = req.query.term as string;
+  const user = req.query.user as string;
+  console.log(`query ${query}`)
+  const dbres = await searchResults(query, user);
+  console.log(dbres)
+  res.json(dbres.map(({ username, is_following }: { username: string; is_following: boolean; }) => ({
+    username,
+    /* TODO: profile page endpoint */
+    follow_link: encodeURI(`${req.baseUrl}/users/${user}/following/${username}`),
+    is_following,
+  })))
 });
 
 export default api;
