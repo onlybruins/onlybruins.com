@@ -183,6 +183,14 @@ export const registerUser = async (username: string, hashedPassword: string, nam
   }
 }
 
+export const getBalance = async (username: string) => {
+  const res = await pool.query(`SELECT balance FROM onlybruins.users WHERE username = $1`, [username]);
+  if (res.rows.length === 0) {
+    return undefined;
+  }
+  return res.rows[0] as number;
+}
+
 export type TipPostResult = Promise<'ok' | 'already tipped' | 'bad username' | 'bad amount' | 'no such post' | 'cannot tip yourself' | 'insufficient funds'>;
 export type TipPostParams = { author_username: string, post_id: number, tipper_username: string, amount: number };
 export const tipPost = async (params: TipPostParams): TipPostResult => {
@@ -278,6 +286,7 @@ export const tipPost = async (params: TipPostParams): TipPostResult => {
 }
 
 export const getTipAmount = async (params: { author_username: string, tipper_username: string, post_id: number }) => {
+  /* TODO: order by consistent */
   const res = await pool.query(
     `SELECT amount
     FROM tips
@@ -336,4 +345,13 @@ export const addNotification = async (username: string, kind: 'money' | 'info', 
       return true;
     }
     return false;
+}
+
+export const searchResults = async (query: string, user: string) => {
+  const likeParam = `%${query}%`;
+  const res = await pool.query(
+    `WITH searching_user AS (SELECT id FROM users WHERE username = $2)
+     SELECT username, EXISTS(SELECT 1 FROM subscriptions, searching_user WHERE creator_id = users.id AND follower_id = searching_user.id)
+     AS is_following FROM users WHERE username LIKE $1 AND username != $2`, [likeParam, user]);
+  return res.rows
 }
