@@ -206,8 +206,6 @@ api.post('/users/:username/posts', async (req: RequestWithUUID, res) => {
 api.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = SHA256(password).toString();
-  console.log(`unhashed: "${password}"`)
-  console.log(`  hashed: "${hashedPassword}"`)
   const dbres = await validateCredentials(username, hashedPassword);
   if (dbres) res.status(200).send();
   else res.status(401).send();
