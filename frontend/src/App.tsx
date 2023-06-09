@@ -5,6 +5,7 @@ import {
   theme,
   Center,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
@@ -121,13 +122,18 @@ export const App = () => {
   const authUI = useAppStore((state) => state.authUI);
   const toast = useToast();
 
+  const toastOptions: UseToastOptions = {
+    position: 'bottom-right',
+    variant: 'left-accent',
+  }
+
   useEffect(() => {
     if (username === undefined) {
       return;
     }
     const timeoutId = setInterval(() => {
       if (username !== undefined) {
-        pollNotifications(username, toast);
+        pollNotifications(username, (opts: UseToastOptions) => toast({...toastOptions, ...opts}));
       }
     }, 500);
     return () => { clearInterval(timeoutId); };
@@ -135,7 +141,7 @@ export const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { position: 'bottom-right', variant: 'left-accent' } }}>
+      <ChakraProvider theme={theme} toastOptions={{defaultOptions: toastOptions }}>
         <Nav />
         <br />
         <Box fontSize="xl">
