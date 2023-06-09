@@ -42,7 +42,7 @@ export default function Login() {
     if (resp.status === 200) {
       signIn(values.username);
     } else {
-      toast({status: 'error', position: 'bottom', title: 'Could not find associated user' });
+      toast({status: 'error', title: 'Could not find associated user' });
     }
   }
 

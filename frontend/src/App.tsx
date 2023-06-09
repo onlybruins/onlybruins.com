@@ -67,7 +67,7 @@ const Feed = () => {
           queryClient.invalidateQueries(['balance']);
         }
         else {
-          res.json().then(json => toast({ status: 'error', 'position': 'bottom-right', title: `Failed to tip: ${json}` }));
+          res.json().then(json => toast({ status: 'error', title: `Failed to tip: ${json}` }));
         }
       });
   }
@@ -109,7 +109,6 @@ const pollNotifications = async (username: string, toast: CallableFunction) => {
           // hack: use warning to get yellow coin-like color
           status: f.kind === 'money' ? 'warning' : 'info',
           icon: f.kind === 'money' ? <CurrencyCircleDollar size="24px" /> : undefined,
-          position: 'bottom-right',
           title: f.message,
         });
       }));
@@ -136,9 +135,7 @@ export const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        {/* <Todos /> */}
-        {/* <Search /> */}
+      <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { position: 'bottom-right', variant: 'left-accent' } }}>
         <Nav />
         <br />
         <Box fontSize="xl">

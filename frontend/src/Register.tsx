@@ -46,7 +46,7 @@ export default function Register() {
     if (resp.status === 200) {
       signIn(values.username);
     } else {
-      toast({ status: 'error', position: 'bottom', title: 'User already exists' });
+      toast({ status: 'error', title: 'User already exists' });
     }
   }
 
