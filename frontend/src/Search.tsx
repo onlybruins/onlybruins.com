@@ -98,7 +98,7 @@ export function Search() {
             <>
               <InputGroup>
                 <InputLeftElement pointerEvents="none" children={<MagnifyingGlass weight="duotone" />} />
-                <Input placeholder="bruh" onChange={(e) => { console.log("hi"); setField(e.target.value) }} />
+                <Input placeholder="filter by username" onChange={(e) => { console.log("hi"); setField(e.target.value) }} />
               </InputGroup>
               <Divider my="3" />
               {
