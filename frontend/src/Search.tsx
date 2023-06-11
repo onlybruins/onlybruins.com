@@ -22,6 +22,8 @@ import { useState } from "react";
 import useAppStore from "./appStore";
 import { MagnifyingGlass, UserCirclePlus } from "phosphor-react";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate, Link, Route, Router } from "react-router-dom"
+import Profile from "./ProfilePage"
 
 type AccountResult = {
   is_following: string;
@@ -61,7 +63,7 @@ const SearchResult = ({ username, is_following, follow_link }: AccountResult) =>
   );
 }
 
-export function Search() {
+export default function Search() {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const username = useAppStore((state) => state.username!);
   const [field, setField] = useState("");

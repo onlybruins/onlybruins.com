@@ -16,17 +16,23 @@ import {
   Image,
   HStack,
 } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom"
 import useAppStore from "./appStore";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 import Sticky from 'react-stickynode'
 import { Balance } from "./Balance";
-import { Search } from "./Search";
+import Search from "./Search";
 
 export default function Nav() {
   const username = useAppStore((state) => state.username);
+  const signIn = useAppStore((state) => state.signIn);
   const signOut = useAppStore((state) => state.signOut)
+  const profilePage = useAppStore((state) => state.profilepage);
+  const authUI = useAppStore((state) => state.authUI);
   const setAuthUI = useAppStore((state) => state.setAuthUI);
+
+  const [condition, setCondition] = useState(false);
 
   return (
     <Sticky innerZ={999}>
@@ -71,6 +77,17 @@ export default function Nav() {
                   </Center>
                   <br />
                   <MenuDivider />
+                  { authUI !== 'profile' ?
+                    <MenuItem onClick={() => {
+                    profilePage(username)
+                    setAuthUI('profile')
+                  }}>
+                    View Your Profile
+                  </MenuItem> :
+                    <MenuItem onClick={() => {
+                      signIn(username)
+                      setAuthUI('login')
+                    }}>Return to Feed</MenuItem> }
                   <MenuItem>Your Servers</MenuItem>
                   <MenuItem>Account Settings</MenuItem>
                   <MenuItem onClick={() => {

@@ -16,6 +16,9 @@ import Register from "./Register";
 import Login from "./Login";
 import { CurrencyCircleDollar } from "phosphor-react";
 import Profile from "./ProfilePage"
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 
 interface BackendPost {
@@ -146,11 +149,11 @@ export const App = () => {
             <VStack spacing={8} width={['100%', '80%', '60%', '40%']}>
               {username === undefined ?
                 (authUI === 'register' ? <Register /> : <Login />)
-                :
+                : (authUI === 'profile' ? <Profile /> :
                 <>
                   <NewPost />
-                  <Feed />
-                </>
+                  <Feed /> 
+                </> )
               }
             </VStack>
           </Center>
