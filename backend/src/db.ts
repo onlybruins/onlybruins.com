@@ -169,7 +169,6 @@ export const validateCredentials = async (username: string, hashedPassword: stri
 }
 
 export const registerUser = async (username: string, hashedPassword: string, name: string, email: string, balance: number) => {
-  console.log(`name is ${name}`);
   if (name === '') name = null;
   if (username === '' || email === '') return false;
   try {
@@ -351,7 +350,15 @@ export const searchResults = async (query: string, user: string) => {
   const likeParam = `%${query.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')}%`;
   const res = await pool.query(
     `WITH searching_user AS (SELECT id FROM users WHERE username = $2)
-     SELECT username, EXISTS(SELECT 1 FROM subscriptions, searching_user WHERE creator_id = users.id AND follower_id = searching_user.id)
-     AS is_following FROM users WHERE username LIKE $1 AND username != $2`, [likeParam, user]);
+    SELECT username,
+        EXISTS(
+          SELECT 1 FROM subscriptions, searching_user
+          WHERE creator_id = users.id
+                AND follower_id = searching_user.id)
+        AS is_following
+    FROM users
+    WHERE username LIKE $1
+          AND username != $2
+    ORDER BY username`, [likeParam, user]);
   return res.rows
 }

@@ -211,11 +211,21 @@ api.post('/login', async (req, res) => {
   else res.status(401).send();
 });
 
+const usernameRegex = RegExp(/^[A-Za-z0-9][-_ A-Za-z0-9]*[A-Za-z0-9]$/);
 api.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
+  if (!usernameRegex.test(username)) {
+    res.status(400).json("Invalid username").send();
+    return;
+  }
   const hashedPassword = SHA256(password).toString();
-  const dbres = await registerUser(username, hashedPassword, name, email, 200);
-  if (dbres) res.status(200).send();
+  const initialBalance = 200;
+  const dbres = await registerUser(username, hashedPassword, name, email, initialBalance);
+  if (dbres) { 
+    console.log(`New user: @${username}`);
+    await addNotification(username, 'money', `Welcome to OnlyBruins! Here's ${initialBalance} bruinbux on us`);
+    res.status(200).send();
+  }
   else res.status(401).send();
 });
 
@@ -228,9 +238,7 @@ api.post('/users/:username/poll-notifications', async (req, res) => {
 api.get('/search', async (req, res) => {
   const query = req.query.term as string;
   const user = req.query.user as string;
-  console.log(`query ${query}`)
   const dbres = await searchResults(query, user);
-  console.log(dbres)
   res.json(dbres.map(({ username, is_following }: { username: string; is_following: boolean; }) => ({
     username,
     /* TODO: profile page endpoint */

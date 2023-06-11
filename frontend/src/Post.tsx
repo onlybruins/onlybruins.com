@@ -10,6 +10,7 @@ import {
   useColorModeValue,
   HStack,
   useToken,
+  useToast,
 } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody } from '@chakra-ui/react'
 import { ArrowCircleRight, CurrencyCircleDollar } from "phosphor-react"
@@ -28,13 +29,18 @@ const Post = ({ imageUrl, postDate, username, tipAmount, setTipAmount }: PostPro
   const [tipField, setTipField] = useState("");
   const color = useColorModeValue('yellow.600', 'yellow.400')
   const [rgb] = useToken('colors', [color])
+  const toast = useToast();
 
   const handleSubmit = () => {
     const n = Number(tipField);
     if (!isNaN(n)
       && n > 0
-      && n <= 200000 // keep amount under 1/10000th of Postgres's max int value
       && Number.isInteger(n)) {
+      if (n > 200000) {
+        // keep amount under 1/10000th of Postgres's max int value
+        toast({ status: 'error', title: `That's too big of a tip, keep your tips under $200000` });
+        return;
+      }
       setTipAmount(n);
     }
   }

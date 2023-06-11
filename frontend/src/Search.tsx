@@ -71,14 +71,12 @@ export default function Search() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['searchResults', { field }],
     queryFn: async (): Promise<AccountResult[]> => {
-      if (field === '') return [];
       const endpoint = '/api/search?' + new URLSearchParams({
         term: field,
         user: username,
       });
       const res = await fetch(endpoint);
       const data = await res.json();
-      console.log("GOT", data)
       return data as AccountResult[];
     }
   })
@@ -102,7 +100,7 @@ export default function Search() {
             <>
               <InputGroup>
                 <InputLeftElement pointerEvents="none" children={<MagnifyingGlass weight="duotone" />} />
-                <Input placeholder="bruh" onChange={(e) => { console.log("hi"); setField(e.target.value) }} />
+                <Input placeholder="filter by username" onChange={(e) => { console.log("hi"); setField(e.target.value) }} />
               </InputGroup>
               <Divider my="3" />
               {

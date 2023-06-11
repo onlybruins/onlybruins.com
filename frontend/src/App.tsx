@@ -5,6 +5,7 @@ import {
   theme,
   Center,
   useToast,
+  UseToastOptions,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroller";
@@ -70,7 +71,7 @@ const Feed = () => {
           queryClient.invalidateQueries(['balance']);
         }
         else {
-          res.json().then(json => toast({ status: 'error', 'position': 'bottom-right', title: `Failed to tip: ${json}` }));
+          res.json().then(json => toast({ status: 'error', title: `Failed to tip: ${json}` }));
         }
       });
   }
@@ -112,7 +113,6 @@ const pollNotifications = async (username: string, toast: CallableFunction) => {
           // hack: use warning to get yellow coin-like color
           status: f.kind === 'money' ? 'warning' : 'info',
           icon: f.kind === 'money' ? <CurrencyCircleDollar size="24px" /> : undefined,
-          position: 'bottom-right',
           title: f.message,
         });
       }));
@@ -125,13 +125,18 @@ export const App = () => {
   const authUI = useAppStore((state) => state.authUI);
   const toast = useToast();
 
+  const toastOptions: UseToastOptions = {
+    position: 'bottom-right',
+    variant: 'left-accent',
+  }
+
   useEffect(() => {
     if (username === undefined) {
       return;
     }
     const timeoutId = setInterval(() => {
       if (username !== undefined) {
-        pollNotifications(username, toast);
+        pollNotifications(username, (opts: UseToastOptions) => toast({...toastOptions, ...opts}));
       }
     }, 500);
     return () => { clearInterval(timeoutId); };
@@ -139,9 +144,7 @@ export const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ChakraProvider theme={theme}>
-        {/* <Todos /> */}
-        {/* <Search /> */}
+      <ChakraProvider theme={theme} toastOptions={{defaultOptions: toastOptions }}>
         <Nav />
         <br />
         <Box fontSize="xl">

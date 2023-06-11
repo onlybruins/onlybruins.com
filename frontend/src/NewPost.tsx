@@ -46,7 +46,6 @@ export const NewPost = () => {
         onClick={handleSubmit((data) => onSubmit(data, (status) => {
           toast({
             status: status,
-            position: 'bottom-right',
             title: status === 'success' ? "posted successfully!" : "could not post :(",
           })
         }))}>
