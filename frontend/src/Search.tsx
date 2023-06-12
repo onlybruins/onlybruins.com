@@ -34,6 +34,9 @@ type AccountResult = {
 const SearchResult = ({ username, is_following, follow_link }: AccountResult) => {
   const queryClient = useQueryClient();
   const boxColor = useColorModeValue('gray.50', 'gray.600');
+  const profilePage = useAppStore((state) => state.profilepage);
+  const authUI = useAppStore((state) => state.authUI);
+  const setAuthUI = useAppStore((state) => state.setAuthUI);
 
   const { mutate } = useMutation({
     mutationFn: async () => {
@@ -58,6 +61,10 @@ const SearchResult = ({ username, is_following, follow_link }: AccountResult) =>
           onClick={() => mutate()}
         >{is_following ? "following" : "follow"}
         </Button>
+        <Button
+          size="sm"
+          onClick={() => { setAuthUI('profile') }}
+        >View Profile</Button>
       </HStack>
     </Box>
   );
